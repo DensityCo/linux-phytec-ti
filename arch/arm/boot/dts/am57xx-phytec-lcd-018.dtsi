@@ -1,0 +1,122 @@
+/*
+ * Copyright (C) 2014 Wadim Egorov <w.egorov@phytec.de> PHYTEC Messtechnik GmbH
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+/*
+ * The board specific DTS file have to:
+ *  - Specify pwms and enable gpios for backlight
+ *  - Mux the display enable pins if available
+ *  - Create the i2c_ts node on the specific i2c bus
+*/
+
+&dra7_pmx_core {
+        lcd_pins: pinmux_lcd {
+                pinctrl-single,pins = <
+			0x158 (PIN_OUTPUT | MUX_MODE4)   /* vin2a_de0.vout2_de */
+			0x15c (PIN_OUTPUT | MUX_MODE4)   /* vin2a_fld0.vout2_clk */
+			0x160 (PIN_OUTPUT | MUX_MODE4)   /* vin2a_hsync0.vout2_hsync */
+			0x164 (PIN_OUTPUT | MUX_MODE4)   /* vin2a_vsync0.vout2_vsync */
+			0x2ac (PIN_OUTPUT | MUX_MODE6)   /* mcasp1_aclkr.vout2_d0 */
+			0x2b0 (PIN_OUTPUT | MUX_MODE6)   /* mcasp1_fsr.vout2_d1 */
+			0x2bc (PIN_OUTPUT | MUX_MODE6)   /* mcasp1_axr2.vout2_d2 */
+			0x2c0 (PIN_OUTPUT | MUX_MODE6)   /* mcasp1_axr3.vout2_d3 */
+			0x2c4 (PIN_OUTPUT | MUX_MODE6)   /* mcasp1_axr4.vout2_d4 */
+			0x2c8 (PIN_OUTPUT | MUX_MODE6)   /* mcasp1_axr5.vout2_d5 */
+			0x2cc (PIN_OUTPUT | MUX_MODE6)   /* mcasp1_axr6.vout2_d6 */
+			0x2d0 (PIN_OUTPUT | MUX_MODE6)   /* mcasp1_axr7.vout2_d7 */
+			0x2fc (PIN_OUTPUT | MUX_MODE6)   /* mcasp2_aclkr.vout2_d8 */
+			0x300 (PIN_OUTPUT | MUX_MODE6)   /* mcasp2_fsr.vout2_d9 */
+			0x304 (PIN_OUTPUT | MUX_MODE6)   /* mcasp2_axr0.vout2_d10 */
+			0x308 (PIN_OUTPUT | MUX_MODE6)   /* mcasp2_axr1.vout2_d11 */
+			0x314 (PIN_OUTPUT | MUX_MODE6)   /* mcasp2_axr4.vout2_d12 */
+			0x318 (PIN_OUTPUT | MUX_MODE6)   /* mcasp2_axr5.vout2_d13 */
+			0x31c (PIN_OUTPUT | MUX_MODE6)   /* mcasp2_axr6.vout2_d14 */
+			0x320 (PIN_OUTPUT | MUX_MODE6)   /* mcasp2_axr7.vout2_d15 */
+			0x334 (PIN_OUTPUT | MUX_MODE6)   /* mcasp4_aclkx.vout2_d16 */
+			0x338 (PIN_OUTPUT | MUX_MODE6)   /* mcasp4_fsx.vout2_d17 */
+			0x33c (PIN_OUTPUT | MUX_MODE6)   /* mcasp4_axr0.vout2_d18 */
+			0x340 (PIN_OUTPUT | MUX_MODE6)   /* mcasp4_axr1.vout2_d19 */
+			0x344 (PIN_OUTPUT | MUX_MODE6)   /* mcasp5_aclkx.vout2_d20 */
+			0x348 (PIN_OUTPUT | MUX_MODE6)   /* mcasp5_fsx.vout2_d21 */
+			0x34c (PIN_OUTPUT | MUX_MODE6)   /* mcasp5_axr0.vout2_d22 */
+			0x350 (PIN_OUTPUT | MUX_MODE6)   /* mcasp5_axr1.vout2_d23 */
+		>;
+	};
+};
+
+/ {
+	lcd_3v3: fixedregulator-lcd {
+		compatible = "regulator-fixed";
+		regulator-name = "lcd_3v3";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-boot-on;
+	};
+
+	backlight: backlight {
+		compatible = "pwm-backlight";
+		brightness-levels = <0 4 8 16 32 64 128 255>;
+		default-brightness-level = <6>;
+		power-supply = <&lcd_3v3>;
+		status = "disabled";
+	};
+ 
+	lcd0: display {
+		compatible = "ETM0700G0DH6", "panel-dpi";
+		pinctrl-names = "default";
+		pinctrl-0 = <&lcd_pins>;
+		status = "disabled";
+
+		label = "lcd";
+
+		panel-timing {
+			clock-frequency = <40000000>;
+			hactive = <800>;
+			vactive = <480>;
+			hfront-porch = <40>;
+			hback-porch = <216>;
+			hsync-len = <128>;
+			vback-porch = <35>;
+			vfront-porch = <10>;
+			vsync-len = <2>;
+			hsync-active = <1>;
+			vsync-active = <1>;
+			de-active = <1>;
+			pixelclk-active = <1>;
+		};
+/*
+		port {
+			lcd_in: endpoint {
+				remote-endpoint = <&dpi_out>;
+			};
+		};
+*/
+	};
+};
+
+&dss {
+/*
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		port {
+			reg = <0>;
+
+			dpi_out: endpoint {
+				remote-endpoint = <&lcd_in>;
+				data-lines = <24>;
+			};
+		};
+	};
+*/
+};
+
+&ft5406 {
+	compatible = "edt,edt-ft5406";
+	reg = <0x38>;
+	status = "disabled";
+};

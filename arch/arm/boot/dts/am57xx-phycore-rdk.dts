@@ -1,0 +1,121 @@
+/*
+ * Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+/dts-v1/;
+
+#include "am57xx-phycore-som.dtsi"
+#include "am57xx-pcm-948.dtsi"
+
+/ {
+	memory {
+		device_type = "memory";
+		reg = <0x80000000 0x80000000>; /* 2GiB */
+	};
+};
+
+/**** SOM - pcm057 ****/
+
+&mmc2 {
+	status = "okay";
+};
+
+&cpsw_emac0 {
+	status = "okay";
+};
+
+&davinci_mdio {
+	status = "okay";
+};
+
+&i2c_eeprom {
+	status = "okay";
+};
+
+&tps659038_rtc {
+	status = "okay";
+};
+
+
+/**** Carrier Board - pcm948 ****/
+
+&uart3 {
+	status = "okay";
+};
+
+&uart5 {
+	status = "okay";
+};
+
+&dcan1 {
+	status = "okay";
+};
+
+&dcan2 {
+	status = "okay";
+};
+
+&cpsw_emac1 {
+	status = "okay";
+};
+
+&mmc1 {
+	status = "okay";
+};
+
+/* LCD-018 display: enable lcd0, backlight, and ft5406 */
+&lcd0 {
+	status = "okay";
+};
+&backlight {
+	status = "okay";
+};
+&ft5406 {
+	status = "okay";
+};
+
+/* HDMI: enable hdmi, hdmi0 and tpd12s521 */
+&tpd12s521 {
+	status = "okay";
+};
+&hdmi {
+	status = "okay";
+};
+&tpd12s521 {
+	status = "okay";
+};
+
+&pcie1 {
+	status = "okay";
+	gpios = <&gpio8 5 GPIO_ACTIVE_LOW>;
+};
+&sata {
+	status = "okay";
+};
+
+/* USB3.0 host: enable usb1 and omap_dwc3_2 */
+&usb1 {
+	status = "okay";
+};
+&omap_dwc3_2 {
+	status = "okay";
+	extcon = <&tps659038_usb>;
+};
+&usb2 {
+	status = "okay";
+	dr_mode = "peripheral"; /* can be configured as host */
+};
+
+/* AUDIO: enable mcasp1, tlv320aic3007, and rdk_audio */
+&mcasp1 {
+	status = "okay";
+};
+&tlv320aic3007 {
+	status = "okay";
+};
+&rdk_audio {
+	status = "okay";
+};
