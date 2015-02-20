@@ -244,7 +244,9 @@ dtb-$(CONFIG_ARCH_OMAP2PLUS) += omap2420-h4.dtb \
 	dra72-evm.dtb \
 	dra72-evm-lcd10.dtb \
 	am57xx-beagle-x15.dtb \
-	am57xx-evm.dtb
+	am57xx-evm.dtb \
+	am57xx-phycore-rdk.dtb \
+	am57xx-phycore-som-complete.dtb
 
 dtb-$(CONFIG_ARCH_ORION5X) += orion5x-lacie-ethernet-disk-mini-v2.dtb
 dtb-$(CONFIG_ARCH_PRIMA2) += prima2-evb.dtb
