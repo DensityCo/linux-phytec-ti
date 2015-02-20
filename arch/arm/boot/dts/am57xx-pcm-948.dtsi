@@ -1,0 +1,436 @@
+/*
+ * Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+/dts-v1/;
+
+#include "dra74x.dtsi"
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/interrupt-controller/irq.h>
+
+/ {
+	model = "Phytec AM57xx PCM-948";
+	compatible = "phytec,am57xx-pcm-948", "phytec,am57xx-phycore-som", "ti,am5728", "ti,dra742", "ti,dra74", "ti,dra7";
+
+	aliases {
+		display0 = &hdmi0;
+	};
+
+	extcon: extcon {
+		compatible = "linux,extcon-gpio";
+		pinctrl-names = "default";
+		pinctrl-0 = <&extcon_pins_default>;
+
+		gpios = <&gpio6 8 GPIO_ACTIVE_HIGH>;
+		cable-name = "USB-HOST";
+	};
+
+	hdmi0: connector@1 {
+		compatible = "omapdss,hdmi-connector";
+		label = "hdmi";
+
+		type = "a";
+
+		port {
+			hdmi_connector_in: endpoint {
+				remote-endpoint = <&tpd12s015_out>;
+			};
+		};
+	};
+
+	tpd12s015: encoder@1 {
+		compatible = "omapdss,ti,tpd12s015";
+
+		gpios = <&gpio7 10 GPIO_ACTIVE_HIGH>,	/* gpio7_10, CT CP HPD */
+			<&gpio6 28 GPIO_ACTIVE_HIGH>,	/* gpio6_28, LS OE */
+			<&gpio7 12 GPIO_ACTIVE_HIGH>;	/* gpio7_12/sp1_cs2, HPD */
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+
+				tpd12s015_in: endpoint@0 {
+					remote-endpoint = <&hdmi_out>;
+				};
+			};
+
+			port@1 {
+				reg = <1>;
+
+				tpd12s015_out: endpoint@0 {
+					remote-endpoint = <&hdmi_connector_in>;
+				};
+			};
+		};
+	};
+
+	audio {
+		compatible = "ti,da830-evm-audio";
+		ti,model = "PCM-948";
+		ti,audio-codec = <&tlv320aic3007>;
+		ti,mcasp-controller = <&mcasp1>;
+		clocks = <&clkout2_clk>;
+		clock-names = "mclk";
+		ti,audio-routing =
+			"Line Out",	"LLOUT",
+			"Line Out",	"RLOUT",
+			"MIC3L",	"Line In", /* Mic2L/LINE2L on aic3104 */
+			"MIC3R",	"Line In"; /* Mic2R/LINE2R on aic3104 */
+	};
+
+	user_leds: user_leds {
+		compatible = "gpio-leds";
+		pinctrl-names = "default", "sleep";
+		pinctrl-0 = <&user_leds_pins_default>;
+		pinctrl-1 = <&user_leds_pins_sleep>;
+
+		led1 {
+			label = "pcm-948:led1";
+			gpios = <&gpio1 28 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "gpio";
+			default-state = "on";
+		};
+
+		led2 {
+			label = "pcm-948:led2";
+			gpios = <&gpio1 29 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "gpio";
+			default-state = "on";
+		};
+	};
+};
+
+&dra7_pmx_core {
+	user_leds_pins_default: leds_pins_default {
+		pinctrl-single,pins = <
+			0x058 (PIN_OUTPUT | MUX_MODE14)	/* gpmc_a6.gpio1_28 */
+			0x05c (PIN_OUTPUT | MUX_MODE14)	/* gpmc_a7.gpio1_29 */
+		>;
+	};
+
+	user_leds_pins_sleep: leds_pins_sleep {
+		pinctrl-single,pins = <
+			0x058 (PIN_INPUT_PULLDOWN | MUX_MODE15)
+			0x05c (PIN_INPUT_PULLDOWN | MUX_MODE15)
+		>;
+	};
+
+	i2c2_pins: pinmux_i2c2_pins {
+		pinctrl-single,pins = <
+			0x408 (PIN_INPUT | MUX_MODE1) /* hdmi1_ddc_scl */
+			0x40c (PIN_INPUT | MUX_MODE1) /* hdmi1_ddc_sda */
+		>;
+	};
+
+	i2c4_pins_default: i2c4_pins_default {
+		pinctrl-single,pins = <
+			0x040 (PIN_INPUT_PULLUP | MUX_MODE7)	/* gpmc_a0.i2c4_scl */
+			0x044 (PIN_INPUT_PULLUP | MUX_MODE7)	/* gpmc_a1.i2c4_sda */
+		>;
+	};
+
+	i2c4_pins_sleep: i2c4_pins_sleep {
+		pinctrl-single,pins = <
+			0x040 (PIN_INPUT | MUX_MODE15)
+			0x044 (PIN_INPUT | MUX_MODE15)
+		>;
+	}
+
+	uart3_pins_default: uart3_pins_default {
+		pinctrl-single,pins = <
+			0x248 (PIN_INPUT_SLEW | MUX_MODE0) /* uart3_rxd.rxd */
+			0x24c (PIN_INPUT_SLEW | MUX_MODE0) /* uart3_txd.txd */
+		>;
+	};
+
+	uart3_pins_sleep: uart3_pins_sleep{
+		pinctrl-single,pins = <
+			0x248 (PIN_INPUT | MUX_MODE15)
+			0x24c (PIN_INPUT | MUX_MODE15)
+		>;
+	};
+
+	mmc1_pins_default: mmc1_pins_default {
+		pinctrl-single,pins = <
+			0x36c (PIN_INPUT | MUX_MODE14)	/* mmc1sdcd.gpio219 */
+			0x354 (PIN_INPUT_PULLUP | MUX_MODE0) /* mmc1_clk.clk */
+			0x358 (PIN_INPUT_PULLUP | MUX_MODE0) /* mmc1_cmd.cmd */
+			0x35c (PIN_INPUT_PULLUP | MUX_MODE0) /* mmc1_dat0.dat0 */
+			0x360 (PIN_INPUT_PULLUP | MUX_MODE0) /* mmc1_dat1.dat1 */
+			0x364 (PIN_INPUT_PULLUP | MUX_MODE0) /* mmc1_dat2.dat2 */
+			0x368 (PIN_INPUT_PULLUP | MUX_MODE0) /* mmc1_dat3.dat3 */
+		>;
+	};
+
+	mmc1_pins_sleep: mmc1_pins_sleep {
+		pinctrl-single,pins = <
+			0x354 (PIN_INPUT | MUX_MODE15)
+			0x358 (PIN_INPUT | MUX_MODE15)
+			0x35c (PIN_INPUT | MUX_MODE15)
+			0x360 (PIN_INPUT | MUX_MODE15)
+			0x364 (PIN_INPUT | MUX_MODE15)
+			0x368 (PIN_INPUT | MUX_MODE15)
+			0x36c (PIN_INPUT | MUX_MODE15)
+		>;
+	};
+
+	cpsw_emac1_pins_default: cpsw_emac1_pins_default {
+		pinctrl-single,pins = <
+			/* Slave 2 */
+			0x198 (PIN_OUTPUT | MUX_MODE3)	/* rgmii2_tclk */
+			0x19c (PIN_OUTPUT | MUX_MODE3)	/* rgmii2_tctl */
+			0x1a0 (PIN_OUTPUT | MUX_MODE3)	/* rgmii2_td3 */
+			0x1a4 (PIN_OUTPUT | MUX_MODE3)	/* rgmii2_td2 */
+			0x1a8 (PIN_OUTPUT | MUX_MODE3)	/* rgmii2_td1 */
+			0x1ac (PIN_OUTPUT | MUX_MODE3)	/* rgmii2_td0 */
+			0x1b0 (PIN_INPUT | MUX_MODE3)	/* rgmii2_rclk */
+			0x1b4 (PIN_INPUT | MUX_MODE3)	/* rgmii2_rctl */
+			0x1b8 (PIN_INPUT | MUX_MODE3)	/* rgmii2_rd3 */
+			0x1bc (PIN_INPUT | MUX_MODE3)	/* rgmii2_rd2 */
+			0x1c0 (PIN_INPUT | MUX_MODE3)	/* rgmii2_rd1 */
+			0x1c4 (PIN_INPUT | MUX_MODE3)	/* rgmii2_rd0 */
+		>;
+
+	};
+
+	cpsw_emac1_pins_sleep: cpsw_emac1_pins_sleep {
+		pinctrl-single,pins = <
+			/* Slave 2 */
+			0x198 (PIN_INPUT | MUX_MODE15)
+			0x19c (PIN_INPUT | MUX_MODE15)
+			0x1a0 (PIN_INPUT | MUX_MODE15)
+			0x1a4 (PIN_INPUT | MUX_MODE15)
+			0x1a8 (PIN_INPUT | MUX_MODE15)
+			0x1ac (PIN_INPUT | MUX_MODE15)
+			0x1b0 (PIN_INPUT | MUX_MODE15)
+			0x1b4 (PIN_INPUT | MUX_MODE15)
+			0x1b8 (PIN_INPUT | MUX_MODE15)
+			0x1bc (PIN_INPUT | MUX_MODE15)
+			0x1c0 (PIN_INPUT | MUX_MODE15)
+			0x1c4 (PIN_INPUT | MUX_MODE15)
+		>;
+	};
+
+	hdmi_pins: pinmux_hdmi_pins {
+		pinctrl-single,pins = <
+			0x3bc 	(PIN_OUTPUT | MUX_MODE14)	/* spi1_cs3.gpio7_10 */
+			0x3b8 	(PIN_OUTPUT | MUX_MODE14)	/* spi1_cs2.gpio7_12 */
+		>;
+	};
+
+	usb1_pins: pinmux_usb1_pins {
+		pinctrl-single,pins = <
+			0x280 (PIN_INPUT_SLEW | MUX_MODE0) /* usb1_drvvbus */
+		>;
+	};
+
+	usb2_pins: pinmux_usb2_pins {
+		pinctrl-single,pins = <
+			0x284 (PIN_INPUT_SLEW | MUX_MODE0) /* usb2_drvvbus */
+		>;
+	};
+
+	extcon_pins_default:  extcon_pins_default {
+		pinctrl-single,pins = <
+			0x1f4 (PIN_INPUT | MUX_MODE14) /* vout1_d6.gpio8_6 */
+		>;
+	};
+
+	clkout2_pins_default: clkout2_pins_default {
+		pinctrl-single,pins = <
+			0x294 (PIN_OUTPUT_PULLDOWN | MUX_MODE9)	/* xref_clk0.clkout2 */
+		>;
+	};
+
+	clkout2_pins_sleep: clkout2_pins_sleep {
+		pinctrl-single,pins = <
+			0x294 (PIN_INPUT | MUX_MODE15)	/* xref_clk0.clkout2 */
+		>;
+	};
+
+	mcasp1_pins_default: mcasp1_pins_default {
+		pinctrl-single,pins = <
+			0x2a4 (PIN_INPUT_PULLDOWN | MUX_MODE0) /* mcasp1_aclkx.mcasp1_aclkx */
+			0x2a8 (PIN_INPUT_PULLDOWN | MUX_MODE0) /* mcasp1_fsx.mcasp1_fsx */
+			0x2ec (PIN_OUTPUT_PULLDOWN | MUX_MODE0) /* mcasp1_axr14.mcasp1_axr14 */
+			0x2f0 (PIN_INPUT_PULLDOWN | MUX_MODE0) /* mcasp1_axr15.mcasp1_axr15 */
+		>;
+	};
+
+	mcasp1_pins_sleep: mcasp1_pins_sleep {
+		pinctrl-single,pins = <
+			0x2a4 (PIN_INPUT | MUX_MODE15)
+			0x2a8 (PIN_INPUT | MUX_MODE15)
+			0x2ec (PIN_INPUT | MUX_MODE15)
+			0x2f0 (PIN_INPUT | MUX_MODE15)
+		>;
+	};
+};
+
+&i2c4 {
+	tlv320aic3007: tlv320aic3007@18 {
+		compatible = "ti,tlv320aic3007";
+		reg = <0x18>;
+		pinctrl-names = "default", "sleep";
+		pinctrl-0 = <&clkout2_pins_default>;
+		pinctrl-1 = <&clkout2_pins_sleep>;
+		status = "disabled";
+		adc-settle-ms = <40>;
+
+		AVDD-supply = <&vdd_3v3>;
+		IOVDD-supply = <&vdd_3v3>;
+		DRVDD-supply = <&vdd_3v3>;
+		DVDD-supply = <&aic_dvdd>;
+	};
+
+	stmpe811: stmpe811@41 {
+		compatible = "st,stmpe811";
+		reg = <0x41>;
+		interrupt-parent = <&gpio6>;
+		interrupts = <4 IRQ_TYPE_LEVEL_LOW>
+		interrupt-controller;
+
+		status = "disabled";
+		wakeup-source
+		st,autosleep-timeout = <1024>;
+
+		stmpe_touchscreen {
+			compatible = "st,stmpe-ts";
+			st,sample-time = <4>;
+			st,mod-12b = <1>;
+			st,ref-sel = <0>;
+			st,adc-freq = <1>;
+			st,ave-ctrl = <1>;
+			st,touch-det-delay = <2>;
+			st,settling = <2>;
+			st,fraction-z = <7>;
+			st,i-drive = <1>;
+		};
+	};
+};
+
+&gpio7 {
+	ti,no-reset-on-init;
+	ti,no-idle-on-init;
+};
+
+&uart3 {
+        status = "disabled";
+        pinctrl-names = "default";
+        pinctrl-0 = <&uart3_pins_default>;
+
+	interrupts-extended = <&gic GIC_SPI 69 IRQ_TYPE_LEVEL_HIGH
+			       &dra7_pmx_core 0x248>;
+};
+
+&mac {
+	status = "okay";
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&cpsw_emac0_pins_default &cpsw_emac1_pins_default>;
+	pinctrl-1 = <&cpsw_emac0_pins_sleep &cpsw_emac1_pins_sleep>;
+	dual_emac;
+};
+
+&cpsw_emac1 {
+	phy_id = <&davinci_mdio>, <2>;
+	phy-mode = "rgmii";
+	dual_emac_res_vlan = <2>;
+	status = "disabled";
+};
+
+&mmc1 {
+	status = "okay";
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&mmc1_pins_default>;
+	pinctrl-1 = <&mmc1_pins_sleep>;
+	vmmc-supply = <&ldo1_reg>;
+	vmmc_aux-supply = <&vdd_3v3>;
+	pbias-supply = <&pbias_regulator>;
+	bus-width = <4>;
+	cd-gpios = <&gpio6 27 0>; /* gpio 219 */
+};
+
+&dss {
+	status = "ok";
+
+	vdda_video-supply = <&ldoln_reg>;
+};
+
+&hdmi {
+	status = "disabled";
+	vdda-supply = <&ldo3_reg>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&hdmi_pins &i2c2_pins>;
+
+	port {
+		hdmi_out: endpoint {
+			remote-endpoint = <&tpd12s015_in>;
+		};
+	};
+};
+
+&usb1 {
+	/*
+	 * NOTE: Assumes R35 is populated(default).
+	 * If R35 is DNP and R39 is populated, this should be "host"
+	 */
+	dr_mode = "peripheral";
+	pinctrl-names = "default";
+	pinctrl-0 = <&usb1_pins>;
+};
+
+&omap_dwc3_1 {
+	extcon = <&extcon>;
+};
+
+&usb2 {
+	dr_mode = "host";
+	pinctrl-names = "default";
+	pinctrl-0 = <&usb2_pins>;
+};
+
+&mcasp1 {
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&mcasp1_pins_default>;
+	pinctrl-1 = <&mcasp1_pins_sleep>;
+	status = "disabled";
+
+	op-mode = <0>;	/* MCASP_IIS_MODE */
+	tdm-slots = <2>;
+	/* 4 serializers */
+	serial-dir = <	/* 0: INACTIVE, 1: TX, 2: RX */
+		1 2 0 0
+	>;
+};
+
+&pruss1 {
+	status = "okay";
+	pru1_0: pru@4b234000 {
+		mboxes = <&mailbox3 &mbox_pru1_0>;
+		status = "okay";
+	};
+
+	pru1_1: pru@4b238000 {
+		mboxes = <&mailbox3 &mbox_pru1_1>;
+		status = "okay";
+	};
+};
+
+&pruss2 {
+	status = "okay";
+	pru2_0: pru@4b2b4000 {
+		mboxes = <&mailbox4 &mbox_pru2_0>;
+		status = "okay";
+	};
+
+	pru2_1: pru@4b2b8000 {
+		mboxes = <&mailbox4 &mbox_pru2_1>;
+		status = "okay";
+	};
+};

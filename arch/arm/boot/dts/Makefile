@@ -443,7 +443,9 @@ dtb-$(CONFIG_SOC_DRA7XX) += \
 	dra72-evm.dtb \
 	dra72-evm-lcd-lg.dtb \
 	dra72-evm-lcd-osd.dtb \
-	am57xx-evm.dtb
+	am57xx-evm.dtb \
+	am57xx-phycore-rdk.dtb \
+	am57xx-phycore-som-complete.dtb
 dtb-$(CONFIG_ARCH_ORION5X) += \
 	orion5x-lacie-d2-network.dtb \
 	orion5x-lacie-ethernet-disk-mini-v2.dtb \
