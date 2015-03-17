@@ -130,7 +130,6 @@
 	};
 
 	extcon: extcon {
-		status = "okay";
 		compatible = "linux,extcon-gpio";
 		pinctrl-names = "default";
 		pinctrl-0 = <&extcon_pins_default>;
@@ -262,7 +261,7 @@
 		>;
 	};
 
-	cpsw_emac_pins_default: cpsw_emac_pins_default {
+	cpsw_pins_default: cpsw_pins_default {
 		pinctrl-single,pins = <
 			/* Slave 1 */
 			0x250 (PIN_OUTPUT | MUX_MODE0)	/* rgmii1_tclk */
@@ -295,7 +294,7 @@
 
 	};
 
-	cpsw_emac_pins_sleep: cpsw_emac_pins_sleep {
+	cpsw_pins_sleep: cpsw_pins_sleep {
 		pinctrl-single,pins = <
 			/* Slave 1 */
 			0x250 (PIN_INPUT | MUX_MODE15)
@@ -607,9 +606,9 @@
 	status = "okay";
 	slaves = <2>;
 	pinctrl-names = "default", "sleep";
-	pinctrl-0 = <&cpsw_emac_pins_default>;
-	pinctrl-1 = <&cpsw_emac_pins_sleep>;
-	dual-emac;
+	pinctrl-0 = <&cpsw_pins_default>;
+	pinctrl-1 = <&cpsw_pins_sleep>;
+	dual_emac;
 };
 
 &cpsw_emac0 {
@@ -706,23 +705,20 @@
 };
 
 &usb1 {
-	status = "okay";
 	/*
 	 * NOTE: Assumes R35 is populated(default).
 	 * If R35 is DNP and R39 is populated, this should be "host"
 	 */
-	dr_mode = "peripheral";
+	dr_mode = "host";
 	pinctrl-names = "default";
 	pinctrl-0 = <&usb1_pins>;
 };
 
 &omap_dwc3_1 {
-	status = "okay";
 	extcon = <&extcon>;
 };
 
 &usb2 {
-	status = "okay";
 	dr_mode = "host";
 	pinctrl-names = "default";
 	pinctrl-0 = <&usb2_pins>;
