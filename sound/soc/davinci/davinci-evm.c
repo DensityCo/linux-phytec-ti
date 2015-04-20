@@ -454,6 +454,16 @@ static struct snd_soc_dai_link dra7xx_evm_link = {
 		   SND_SOC_DAIFMT_IB_NF,
 };
 
+static struct snd_soc_dai_link pcm_948_dai_link = {
+	.name		= "TLV320AIC3X",
+	.stream_name	= "AIC3X",
+	.codec_dai_name	= "tlv320aic3x-hifi",
+	.ops		= &evm_ops,
+	.init		= evm_aic3x_init,
+	.dai_fmt = SND_SOC_DAIFMT_DSP_B | SND_SOC_DAIFMT_CBM_CFM |
+		  SND_SOC_DAIFMT_IB_NF,
+};
+
 static const struct of_device_id davinci_evm_dt_ids[] = {
 	{
 		.compatible = "ti,da830-evm-audio",
@@ -466,6 +476,10 @@ static const struct of_device_id davinci_evm_dt_ids[] = {
 	{
 		.compatible = "ti,dra7xx-evm-audio",
 		.data = (void *) &dra7xx_evm_link,
+	},
+	{
+		.compatible = "phytec,pcm-948-audio",
+		.data = &pcm_948_dai_link,
 	},
 	{ /* sentinel */ }
 };
