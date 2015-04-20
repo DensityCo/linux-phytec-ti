@@ -1857,6 +1857,22 @@ static struct omap_hwmod_class dra7xx_mcasp_hwmod_class = {
 	.sysc	= &dra7xx_mcasp_sysc,
 };
 
+/* mcasp1 */
+static struct omap_hwmod dra7xx_mcasp1_hwmod = {
+	.name		= "mcasp1",
+	.class		= &dra7xx_mcasp_hwmod_class,
+	.clkdm_name	= "ipu_clkdm",
+	.main_clk	= "mcasp1_ahclkx_mux",
+	.flags		= HWMOD_SWSUP_SIDLE,
+	.prcm = {
+		.omap4 = {
+			.clkctrl_offs = DRA7XX_CM_IPU_MCASP1_CLKCTRL_OFFSET,
+			.context_offs = DRA7XX_RM_IPU_MCASP1_CONTEXT_OFFSET,
+			.modulemode   = MODULEMODE_SWCTRL,
+		},
+	},
+};
+
 /* mcasp3 */
 static struct omap_hwmod dra7xx_mcasp3_hwmod = {
 	.name		= "mcasp3",
@@ -3530,6 +3546,22 @@ static struct omap_hwmod_ocp_if dra7xx_l3_main_1__hdmi = {
 	.user		= OCP_USER_MPU | OCP_USER_SDMA,
 };
 
+/* l3_main_1 -> mcasp1 */
+static struct omap_hwmod_ocp_if dra7xx_l3_main_1__mcasp1 = {
+	.master		= &dra7xx_l3_main_1_hwmod,
+	.slave		= &dra7xx_mcasp1_hwmod,
+	.clk		= "l3_iclk_div",
+	.user		= OCP_USER_MPU | OCP_USER_SDMA,
+};
+
+/* l4_per2 -> mcasp1 */
+static struct omap_hwmod_ocp_if dra7xx_l4_per2__mcasp1 = {
+	.master		= &dra7xx_l4_per2_hwmod,
+	.slave		= &dra7xx_mcasp1_hwmod,
+	.clk		= "l3_iclk_div",
+	.user		= OCP_USER_MPU | OCP_USER_SDMA,
+};
+
 /* l4_per2 -> mcasp3 */
 static struct omap_hwmod_ocp_if dra7xx_l4_per2__mcasp3 = {
 	.master		= &dra7xx_l4_per2_hwmod,
@@ -4530,6 +4562,8 @@ static struct omap_hwmod_ocp_if *dra7xx_hwmod_ocp_ifs[] __initdata = {
 	&dra7xx_l4_wkup__dcan1,
 	&dra7xx_l4_per2__dcan2,
 	&dra7xx_l4_per2__cpgmac0,
+	&dra7xx_l3_main_1__mcasp1,
+	&dra7xx_l4_per2__mcasp1,
 	&dra7xx_l4_per2__mcasp3,
 	&dra7xx_l4_per2__mcasp8,
 	&dra7xx_gmac__mdio,
