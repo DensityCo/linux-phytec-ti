@@ -1333,6 +1333,13 @@ static struct davinci_mcasp_pdata dra7_mcasp_pdata = {
 	.version = MCASP_VERSION_4,
 };
 
+static struct davinci_mcasp_pdata dra7_mcasp1_pdata = {
+	.tx_dma_offset = 0x238,
+	.rx_dma_offset = 0x2BC,
+	.asp_chan_q = EVENTQ_0,
+	.version = MCASP_VERSION_4,
+};
+
 static const struct of_device_id mcasp_dt_ids[] = {
 	{
 		.compatible = "ti,dm646x-mcasp-audio",
@@ -1350,6 +1357,11 @@ static const struct of_device_id mcasp_dt_ids[] = {
 		.compatible = "ti,dra7-mcasp-audio",
 		.data = &dra7_mcasp_pdata,
 	},
+	{
+		.compatible = "ti,dra7-mcasp1-audio",
+		.data = &dra7_mcasp1_pdata,
+	},
+
 	{ /* sentinel */ }
 };
 MODULE_DEVICE_TABLE(of, mcasp_dt_ids);
