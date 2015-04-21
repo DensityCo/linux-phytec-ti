@@ -333,6 +333,7 @@ int __init dra7xx_dt_clk_init(void)
 	struct clk *dsp_dpll, *dsp_m2_dpll, *dsp_m3x2_dpll;
 	struct clk *atl_fck, *atl_parent;
 	struct clk *iva_dpll, *iva_m2_dpll;
+	struct clk *dcan1_fck, *sys_clkin1;
 
 	ti_dt_clocks_register(dra7xx_clks);
 
@@ -357,6 +358,10 @@ int __init dra7xx_dt_clk_init(void)
 	rc = clk_set_rate(dpll_ck, DRA7_DPLL_GMAC_DEFFREQ);
 	if (rc)
 		pr_err("%s: failed to configure GMAC DPLL!\n", __func__);
+
+	dcan1_fck = clk_get_sys(NULL, "dcan1_sys_clk_mux");
+	sys_clkin1 = clk_get_sys(NULL, "sys_clkin1");
+	rc = clk_set_parent(dcan1_fck, sys_clkin1);
 
 	dss_deshdcp_ck = clk_get_sys(NULL, "dss_deshdcp_clk");
 	rc = clk_prepare_enable(dss_deshdcp_ck);
