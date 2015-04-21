@@ -17,6 +17,11 @@ config DRM_OMAP_ENCODER_TPD12S015
 	  Driver for TPD12S015, which offers HDMI ESD protection and level
 	  shifting.
 
+config DRM_OMAP_ENCODER_TPD12S521
+        tristate "TPD12S521 HDMI ESD protection"
+	help
+	  Driver for TPD12S521, which offers HDMI ESD protection.
+
 config DRM_OMAP_ENCODER_TC358768
 	tristate "Toshiba TC358768/TC358778 DPI to DSI encoder"
 	depends on I2C
