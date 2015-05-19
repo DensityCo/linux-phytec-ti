@@ -18,6 +18,8 @@
 	aliases {
 		rtc0 = &rtc;
 		rtc1 = &tps659038_rtc;
+		display0 = &lcd0;
+		display1 = &hdmi0;
 	};
 
 	memory {
@@ -528,6 +530,24 @@
 			0x2f0 (PIN_INPUT | MUX_MODE15)
 		>;
 	};
+
+	ehrpwm1a_pin: ehrpwm1a_pin {
+		pinctrl-single,pins = <
+			0xf4 (PIN_OUTPUT_PULLDOWN | MUX_MODE10) /* vin1a_d0.ehrpwm1A */
+		>;
+	};
+
+	edt_ts_irq_pin: edt_ts_irq_pin {
+		pinctrl-single,pins = <
+			0x234 (PIN_INPUT_PULLUP | MUX_MODE14) /* vout1_d22.gpio8_22 */
+		>;
+	};
+
+	display_en_pin: display_en_pin {
+		pinctrl-single,pins = <
+			0x238 (PIN_OUTPUT_PULLDOWN | MUX_MODE14) /* vout1_d23.gpio8_23 */
+		>;
+	};
 };
 
 &i2c1 {
@@ -711,7 +731,14 @@
 		DVDD-supply = <&aic_dvdd>;
 	};
 
-	stmpe811: stmpe811@41 {
+	ft5406: cap-touch@38 {
+		pinctrl-names = "default";
+		pinctrl-0 = <&edt_ts_irq_pin>;
+		interrupt-parent = <&gpio8>;
+		interrupts = <22 0>;
+	};
+
+	stmpe811: res-touch@41 {
 		compatible = "st,stmpe811";
 		reg = <0x41>;
 		interrupt-parent = <&gpio6>;
@@ -735,6 +762,47 @@
 			st,i-drive = <1>;
 		};
 	};
+};
+
+&dss {
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		port {
+			reg = <0>;
+
+			dpi_out: endpoint {
+				remote-endpoint = <&lcd_in>;
+				data-lines = <24>;
+			};
+		};
+	};
+};
+
+&epwmss0 {
+	status = "okay";
+};
+
+&ehrpwm0 {
+	status = "okay";
+};
+
+#include "am57xx-phytec-lcd-018.dtsi"
+
+&lcd0 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&display_en_pin>;
+
+	enable-gpios = <&gpio8 23 GPIO_ACTIVE_HIGH>;
+};
+
+&backlight {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&ehrpwm1a_pin>;
+
+	pwms = <&ehrpwm1 0 50000 0>;
 };
 
 &gpio4 {
