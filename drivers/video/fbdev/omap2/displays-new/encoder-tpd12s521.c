@@ -1,5 +1,5 @@
 /*
- * TPD12S521 HDMI ESD protection & level shifter chip driver
+ * TPD12S521 HDMI ESD protection driver
  * Copyright (C) 2015 PHYTEC America, LLC.
  * Author: Russell Robinson <rrobinson@phytec.com>
  *
@@ -336,6 +336,6 @@ static struct platform_driver tpd_driver = {
 
 module_platform_driver(tpd_driver);
 
-MODULE_AUTHOR("Tomi Valkeinen <tomi.valkeinen@ti.com>");
-MODULE_DESCRIPTION("TPD12S015 driver");
+MODULE_AUTHOR("Russell Robinson <rrobinson@phytec.com>");
+MODULE_DESCRIPTION("TPD12S521 driver");
 MODULE_LICENSE("GPL");
