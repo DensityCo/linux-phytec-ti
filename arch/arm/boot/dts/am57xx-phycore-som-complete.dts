@@ -20,6 +20,8 @@
 		rtc1 = &tps659038_rtc;
 		display0 = &lcd0;
 		display1 = &hdmi0;
+		sound0 = &rdk_audio;
+		sound1 = &hdmi;
 	};
 
 	memory {
@@ -119,12 +121,12 @@
 		regulator-max-microvolt = <1800000>;
 
 		/* WLAN_EN GPIO */
-		gpio = <&gpio1 24 GPIO_ACTIVE_HIGH>;
+		gpio = <&gpio1 24 0>;
 		enable-active-high;
 	};
 
 	hdmi0: connector@1 {
-		compatible = "omapdss,hdmi-connector";
+		compatible = "hdmi-connector";
 		label = "hdmi";
 
 		type = "a";
@@ -137,7 +139,7 @@
 	};
 
 	tpd12s521: encoder@1 {
-		compatible = "omapdss,ti,tpd12s521";
+		compatible = "ti,tpd12s521";
 
 		gpios = <&gpio7 12 GPIO_ACTIVE_HIGH>;	/* gpio7_12/sp1_cs2, HPD */
 
@@ -207,7 +209,7 @@
 		cable-name = "USB-HOST";
 	};
 
-	sound {
+	rdk_audio: sound {
 		compatible = "phytec,pcm-948-audio";
 
 		ti,model = "phyCORE-AM57xx-RDK";
