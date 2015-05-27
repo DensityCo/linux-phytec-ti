@@ -20,10 +20,9 @@ config DISPLAY_DRA7EVM_ENCODER_TPD12S015
 	  hacks required for HDMI to work properly on J6 EVM.
 
 config DISPLAY_ENCODER_TPD12S521
-        tristate "TPD12S521 HDMI ESD protection and level shifter"
+        tristate "TPD12S521 HDMI ESD protection"
 	help
-	  Driver for TPD12S521, which offers HDMI ESD protection and level
-	  shifting.
+	  Driver for TPD12S521, which offers HDMI ESD protection.
 
 config DISPLAY_ENCODER_SII9022
 	tristate "SiI9022 HDMI Encoder"
