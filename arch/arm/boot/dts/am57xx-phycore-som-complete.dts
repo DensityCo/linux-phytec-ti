@@ -902,6 +902,7 @@
 	pinctrl-0 = <&cpsw_pins_default>;
 	pinctrl-1 = <&cpsw_pins_sleep>;
 	dual_emac;
+	ti,no-idle;
 };
 
 &cpsw_emac0 {
