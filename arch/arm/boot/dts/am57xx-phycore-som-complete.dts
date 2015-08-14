@@ -995,6 +995,60 @@
 	gpios = <&gpio8 5 GPIO_ACTIVE_LOW>;
 };
 
+&usb1 {
+	/*
+	 * NOTE: Assumes R35 is populated(default).
+	 * If R35 is DNP and R39 is populated, this should be "host"
+	 */
+	dr_mode = "host";
+	pinctrl-names = "default";
+	pinctrl-0 = <&usb1_pins>;
+};
+
+&omap_dwc3_1 {
+	extcon = <&extcon>;
+};
+
+&omap_dwc3_2 {
+	status = "disabled";
+};
+
+&usb2 {
+	dr_mode = "host";
+	pinctrl-names = "default";
+	pinctrl-0 = <&usb2_pins>;
+};
+
+&dcan1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&dcan1_pins>;
+	status = "okay";
+};
+
+&dcan2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&dcan2_pins>;
+	status = "okay";
+};
+
+&mcasp1 {
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&mcasp1_pins_default>;
+	pinctrl-1 = <&mcasp1_pins_sleep>;
+	status = "okay";
+
+	op-mode = <0>;  /* MCASP_IIS_MODE */
+	tdm-slots = <2>;
+	/* mcasp1_axr14 = TX, mcasp1_axr15 = RX */
+	serial-dir = <  /* 0: INACTIVE, 1: TX, 2: RX */
+		0 0 0 0
+		0 0 0 0
+		0 0 0 0
+		0 0 1 2
+	>;
+};
+
+
 &mailbox3 {
 	status = "okay";
 	mbox_pru1_0: mbox_pru1_0 {
@@ -1047,57 +1101,47 @@
 	status = "okay";
 };
 
-&usb1 {
-	/*
-	 * NOTE: Assumes R35 is populated(default).
-	 * If R35 is DNP and R39 is populated, this should be "host"
-	 */
-	dr_mode = "host";
-	pinctrl-names = "default";
-	pinctrl-0 = <&usb1_pins>;
-};
-
-&omap_dwc3_1 {
-	extcon = <&extcon>;
-};
-
-&omap_dwc3_2 {
-	status = "disabled";
-};
-
-&usb2 {
-	dr_mode = "host";
-	pinctrl-names = "default";
-	pinctrl-0 = <&usb2_pins>;
-};
-
-&dcan1 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&dcan1_pins>;
+&mmu1_dsp2 {
 	status = "okay";
 };
 
-&dcan2 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&dcan2_pins>;
+&mmu_ipu1 {
 	status = "okay";
 };
 
-&mcasp1 {
-	pinctrl-names = "default", "sleep";
-	pinctrl-0 = <&mcasp1_pins_default>;
-	pinctrl-1 = <&mcasp1_pins_sleep>;
+&mmu_ipu2 {
 	status = "okay";
+};
 
-	op-mode = <0>;  /* MCASP_IIS_MODE */
-	tdm-slots = <2>;
-	/* mcasp1_axr14 = TX, mcasp1_axr15 = RX */
-	serial-dir = <  /* 0: INACTIVE, 1: TX, 2: RX */
-		0 0 0 0
-		0 0 0 0
-		0 0 0 0
-		0 0 1 2
-	>;
+&ipu1 {
+	status = "okay";
+	memory-region = <&ipu1_cma_pool>;
+	mboxes = <&mailbox5 &mbox_ipu1_legacy>;
+	timers = <&timer11>;
+	watchdog-timers = <&timer7>, <&timer8>;
+};
+
+&ipu2 {
+	status = "okay";
+	memory-region = <&ipu2_cma_pool>;
+	mboxes = <&mailbox6 &mbox_ipu2_legacy>;
+	timers = <&timer3>;
+	watchdog-timers = <&timer4>, <&timer9>;
+};
+
+&dsp1 {
+	status = "okay";
+	memory-region = <&dsp1_cma_pool>;
+	mboxes = <&mailbox5 &mbox_dsp1_legacy>;
+	timers = <&timer5>;
+	watchdog-timers = <&timer10>;
+};
+
+&dsp2 {
+	status = "okay";
+	memory-region = <&dsp2_cma_pool>;
+	mboxes = <&mailbox6 &mbox_dsp2_legacy>;
+	timers = <&timer6>;
 };
 
 &pruss1 {
