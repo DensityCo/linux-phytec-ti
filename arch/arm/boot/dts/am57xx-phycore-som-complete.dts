@@ -95,6 +95,18 @@
 		gpio = <&gpio4 8 GPIO_ACTIVE_HIGH>;
 	};
 
+	wlan_fixed: fixedregulator-wlan {
+		compatible = "regulator-fixed";
+		regulator-name = "wlan_fixed";
+		/*vin-supply = <&ldo1_reg>;*/
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+
+		/* WLAN_EN GPIO */
+		gpio = <&gpio1 24 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+	};
+
 	hdmi0: connector@1 {
 		compatible = "omapdss,hdmi-connector";
 		label = "hdmi";
@@ -322,6 +334,44 @@
 			0x90 (PIN_INPUT | MUX_MODE15)
 			0x94 (PIN_INPUT | MUX_MODE15)
 			0x98 (PIN_INPUT | MUX_MODE15)
+		>;
+	};
+
+	mmc3_pins_default: mmc3_pins_default {
+		pinctrl-single,pins = <
+			0x37c (PIN_INPUT_PULLUP | MUX_MODE0) /* mmc3_clk.clk */
+			0x380 (PIN_INPUT_PULLUP | MUX_MODE0) /* mmc3_cmd.cmd */
+			0x384 (PIN_INPUT_PULLUP | MUX_MODE0) /* mmc3_dat0.dat0 */
+			0x388 (PIN_INPUT_PULLUP | MUX_MODE0) /* mmc3_dat1.dat1 */
+			0x38c (PIN_INPUT_PULLUP | MUX_MODE0) /* mmc3_dat2.dat2 */
+			0x390 (PIN_INPUT_PULLUP | MUX_MODE0) /* mmc3_dat3.dat3 */
+		>;
+	};
+
+	mmc3_pins_sleep: mmc3_pins_sleep {
+		pinctrl-single,pins = <
+			0x37c (PIN_INPUT | MUX_MODE15)
+			0x380 (PIN_INPUT | MUX_MODE15)
+			0x384 (PIN_INPUT | MUX_MODE15)
+			0x388 (PIN_INPUT | MUX_MODE15)
+			0x38c (PIN_INPUT | MUX_MODE15)
+			0x390 (PIN_INPUT | MUX_MODE15)
+		>;
+	};
+
+	wlan_bt_pins_default: wlan_bt_pins_default {
+		pinctrl-single,pins = <
+			0x394 (PIN_OUTPUT_PULLDOWN | MUX_MODE14) /* mmc3_dat4.gpio1_22 */
+			0x39c (PIN_OUTPUT_PULLDOWN | MUX_MODE14) /* mmc3_dat6.gpio1_24 */
+			0x3a0 (PIN_INPUT_PULLUP | MUX_MODE14)  /* mmc3_dat7.gpio1_25 */
+		>;
+	};
+
+	wlan_bt_pins_sleep: wlan_bt_pins_sleep {
+		pinctrl-single,pins = <
+			0x394 (PIN_INPUT | MUX_MODE15)
+			0x39c (PIN_INPUT | MUX_MODE15)
+			0x3a0 (PIN_INPUT_PULLUP | MUX_MODE14)
 		>;
 	};
 
@@ -774,6 +824,29 @@
 	bus-width = <8>;
 	ti,non-removable;
 	cap-mmc-dual-data-rate;
+};
+
+&mmc3 {
+	status = "okay";
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&mmc3_pins_default &wlan_bt_pins_default>;
+	pinctrl-1 = <&mmc3_pins_sleep &wlan_bt_pins_sleep>;
+	vmmc-supply = <&wlan_fixed>;
+	vmmc_aux-supply = <&vdd_3v3>;
+	bus-width = <4>;
+	ti,non-removable;
+	ti,needs-special-hs-handling;
+	cap-power-off-card;
+	keep-power-in-suspend;
+
+	#address-cells = <1>;
+	#size-cells = <0>;
+	wlcore: wlcore@0 {
+		compatible = "ti,wlcore";
+		reg = <2>;
+		interrupt-parent = <&gpio1>;
+		interrupts = <25 IRQ_TYPE_NONE>;
+	};
 };
 
 &dss {
