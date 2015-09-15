@@ -13,11 +13,15 @@
 / {
 	memory {
 		device_type = "memory";
-		reg = <0x80000000 0x40000000>; /* 1GB to start. Target 2GB */
+		reg = <0x80000000 0x80000000>; /* 2GiB */
 	};
 };
 
-/* SOM - pcm057 */
+/**** SOM - pcm057 ****/
+
+&mmc2 {
+	status = "okay";
+};
 
 &cpsw_emac0 {
 	status = "okay";
@@ -31,32 +35,69 @@
 	status = "okay";
 };
 
-/* Carrier Board - pcm948 */
+&tps659038_rtc {
+	status = "okay";
+};
+
+
+/**** Carrier Board - pcm948 ****/
 
 &uart3 {
 	status = "okay";
-}
+};
 
 &cpsw_emac1 {
 	status = "okay";
 };
 
-/* [RR] Uncomment to enable STMPE811 resistive touch
- * 	for use with LCD-017
- */
-/*
-&stmpe811 {
-	staus = "okay";
+&mmc1 {
+	status = "okay";
 };
-*/
 
-// TODO: [RR] enable audio support
-/*
+/* LCD-018 display: enable lcd0, backlight, and ft5406 */
+&lcd0 {
+	status = "okay";
+};
+&backlight {
+	status = "okay";
+};
+&ft5406 {
+	status = "okay";
+};
+
+/* HDMI: enable hdmi and tpd12s521 */
+&hdmi {
+	status = "okay";
+};
+&tpd12s521 {
+	status = "okay";
+};
+
+&pcie1 {
+	status = "okay";
+	gpios = <&gpio8 5 GPIO_ACTIVE_LOW>;
+};
+
+/* USB3.0 host: enable usb1 and omap_dwc3_2 */
+&usb1 {
+	status = "okay";
+};
+&omap_dwc3_2 {
+	status = "okay";
+	extcon = <&tps659038_usb>;
+};
+&usb2 {
+	status = "okay";
+	dr_mode = "peripheral"; /* can be configured as host */
+};
+
+/* AUDIO: enable mcasp1, tlv320aic3007, and rdk_audio */
 &mcasp1 {
 	status = "okay";
 };
-
 &tlv320aic3007 {
 	status = "okay";
 };
-*/
+&rdk_audio {
+	status = "okay";
+};
