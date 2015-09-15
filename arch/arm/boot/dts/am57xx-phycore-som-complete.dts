@@ -531,9 +531,9 @@
 	};
 
 	i2c_eeprom: eeprom@50 {
-		status = "disabled";
+		status = "okay";
 		compatible = "at,24c32";
-		reg = <0x52>;
+		reg = <0x50>;
 		pagesize = <32>;
 	};
 };
