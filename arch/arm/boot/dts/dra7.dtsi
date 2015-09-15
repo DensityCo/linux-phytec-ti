@@ -1869,21 +1869,6 @@
 			status = "disabled";
 		};
 
-		mcasp1: mcasp@48460000 {
-			compatible = "ti,dra7-mcasp1-audio";
-			ti,hwmods = "mcasp1";
-			reg = <0x48460000 0x2000>;
-			reg-names = "mpu";
-			interrupts = <GIC_SPI 104 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 103 IRQ_TYPE_LEVEL_HIGH>;
-			interrupt-names = "tx", "rx";
-			dmas = <&sdma 129 &dmacb>, <&sdma 128 &dmacb>;
-			dma-names = "tx", "rx";
-			clocks = <&mcasp1_ahclkr_mux>, <&mcasp1_ahclkx_mux>;
-			clock-names = "ahclkr", "fck";
-			status = "disabled";
-		};
-
 		mcasp3: mcasp@48468000 {
 			compatible = "ti,dra7-mcasp-audio";
 			ti,hwmods = "mcasp3";
