@@ -5,8 +5,6 @@
  * it under the terms of the GNU General Public License version 2 as
  * published by the Free Software Foundation.
  */
-/dts-v1/;
-
 #include "dra74x.dtsi"
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/interrupt-controller/irq.h>
@@ -16,14 +14,13 @@
 	compatible = "phytec,am57xx-phycore-som", "ti,am5728", "ti,dra742", "ti,dra74", "ti,dra7";
 
 	aliases {
-		rtc0 = &i2c_rtc;
-		rtc1 = &rtc;
-		rtc2 = &tps659038_rtc;
+		rtc0 = &rtc;
+		rtc1 = &tps659038_rtc;
 	};
 
 	memory {
 		device_type = "memory";
-		reg = <0x80000000 0x40000000>; /* 1GB to start. Target 2GB */
+		reg = <0x80000000 0x80000000>; /* 2GiB */
 	};
 
 	reserved-memory {
@@ -58,13 +55,27 @@
 			reusable;
 			status = "okay";
 		};
+	};
 
-                cmem_block_0: cmem_block@a0000000 {
-                        reg = <0xa0000000 0x20000000>;
-                        no-map;
-                        status = "okay";
-                };
+	ocp {
+		mcasp1: mcasp@48460000 {
+			compatible = "ti,dra7-mcasp1-audio";
+			ti,hwmods = "mcasp1";
+			reg = <0x48460000 0x2000>;
+			reg-names = "mpu";
+			interrupts = <GIC_SPI 104 IRQ_TYPE_LEVEL_HIGH>,
+				     <GIC_SPI 103 IRQ_TYPE_LEVEL_HIGH>;
+			interrupt-names = "tx", "rx";
+			dmas = <&sdma 129 &dmacb>, <&sdma 128 &dmacb>;
+			dma-names = "tx", "rx";
+			clocks = <&mcasp1_ahclkr_mux>, <&mcasp1_ahclkx_mux>;
+			clock-names = "ahclkr", "fck";
+			status = "disabled";
+		};
 
+		gpu: gpu@0x56000000 {
+			gpu0-voltdm = <&voltdm_gpu>;
+		};
 	};
 
 	vdd_3v3: fixedregulator-vdd_3v3 {
@@ -93,24 +104,24 @@
 		regulator-always-on;
 		regulator-boot-on;
 		enable-active-high;
-		gpio = <&gpio7 11 GPIO_ACTIVE_HIGH>;
+		gpio = <&gpio4 8 GPIO_ACTIVE_HIGH>;
 	};
 
-	leds {
+	phytec_leds: leds {
 		compatible = "gpio-leds";
 		pinctrl-names = "default", "sleep";
-		pinctrl-0 = <&leds_pins_default>;
-		pinctrl-1 = <&leds_pins_sleep>;
+		pinctrl-0 = <&leds_som_pins_default>;
+		pinctrl-1 = <&leds_som_pins_sleep>;
 
 		led@0 {
-			label = "pcm-057:red";
+			label = "am57xx-phycore-som:red";
 			gpios = <&gpio4 9 GPIO_ACTIVE_HIGH>;
 			linux,default-trigger = "heartbeat";
 			default-state = "off";
 		};
 
 		led@1 {
-			label = "pcm-057:green";
+			label = "am57xx-phycore-som:green";
 			gpios = <&gpio4 10 GPIO_ACTIVE_HIGH>;
 			linux,default-trigger = "cpu0";
 			default-state = "off";
@@ -119,14 +130,14 @@
 };
 
 &dra7_pmx_core {
-	leds_pins_default: leds_pins_default {
+	leds_som_pins_default: leds_som_pins_default {
 		pinctrl-single,pins = <
 			0x188 (PIN_OUTPUT | MUX_MODE14)	/* vin2a_d8.gpio4_9 */
 			0x18c (PIN_OUTPUT | MUX_MODE14)	/* vin2a_d9.gpio4_10 */
 		>;
 	};
 
-	leds_pins_sleep: leds_pins_sleep {
+	leds_som_pins_sleep: leds_som_pins_sleep {
 		pinctrl-single,pins = <
 			0x188 (PIN_INPUT_PULLDOWN | MUX_MODE15)
 			0x18c (PIN_INPUT_PULLDOWN | MUX_MODE15)
@@ -177,7 +188,22 @@
 		>;
 	};
 
-	cpsw_emac0_pins_default: cpsw_emac0_pins_default {
+	mmc2_pins_hs: mmc2_pins_hs {
+		pinctrl-single,pins = <
+			0x9c (PIN_INPUT_PULLUP | MUX_VIRTUAL_MODE11 | MUX_MODE1) /* gpmc_a23.mmc2_clk */
+			0xb0 (PIN_INPUT_PULLUP | MUX_VIRTUAL_MODE11 | MUX_MODE1) /* gpmc_cs1.mmc2_cmd */
+			0xa0 (PIN_INPUT_PULLUP | MUX_VIRTUAL_MODE11 | MUX_MODE1) /* gpmc_a24.mmc2_dat0 */
+			0xa4 (PIN_INPUT_PULLUP | MUX_VIRTUAL_MODE11 | MUX_MODE1) /* gpmc_a25.mmc2_dat1 */
+			0xa8 (PIN_INPUT_PULLUP | MUX_VIRTUAL_MODE11 | MUX_MODE1) /* gpmc_a26.mmc2_dat2 */
+			0xac (PIN_INPUT_PULLUP | MUX_VIRTUAL_MODE11 | MUX_MODE1) /* gpmc_a27.mmc2_dat3 */
+			0x8c (PIN_INPUT_PULLUP | MUX_VIRTUAL_MODE11 | MUX_MODE1) /* gpmc_a19.mmc2_dat4 */
+			0x90 (PIN_INPUT_PULLUP | MUX_VIRTUAL_MODE11 | MUX_MODE1) /* gpmc_a20.mmc2_dat5 */
+			0x94 (PIN_INPUT_PULLUP | MUX_VIRTUAL_MODE11 | MUX_MODE1) /* gpmc_a21.mmc2_dat6 */
+			0x98 (PIN_INPUT_PULLUP | MUX_VIRTUAL_MODE11 | MUX_MODE1) /* gpmc_a22.mmc2_dat7 */
+		>;
+	};
+
+	emac0_pins_default: emac0_pins_default {
 		pinctrl-single,pins = <
 			/* Slave 1 */
 			0x250 (PIN_OUTPUT | MUX_MODE0)	/* rgmii1_tclk */
@@ -196,7 +222,7 @@
 
 	};
 
-	cpsw_emac0_pins_sleep: cpsw_emac0_pins_sleep {
+	emac0_pins_sleep: emac0_pins_sleep {
 		pinctrl-single,pins = <
 			/* Slave 1 */
 			0x250 (PIN_INPUT | MUX_MODE15)
@@ -234,12 +260,6 @@
 			0x418 (PIN_INPUT_PULLUP | MUX_MODE14)	/* wakeup0.gpio1_0 */
 		>;
 	};
-	i2c_rtc_pins_default: i2c_rtc_pins_default {
-		pinctrl-single,pins = <
-			0x41c (PIN_INPUT_PULLUP | MUX_MODE14)	/* wakeup1.gpio1_1 */
-		>;
-	};
-
 };
 
 &i2c1 {
@@ -270,7 +290,7 @@
 				smps12_reg: smps12 {
 					/* VDD_MPU */
 					regulator-name = "smps12";
-					regulator-min-microvolt = < 850000>;
+					regulator-min-microvolt = <850000>;
 					regulator-max-microvolt = <1250000>;
 					regulator-always-on;
 					regulator-boot-on;
@@ -288,7 +308,7 @@
 				smps45_reg: smps45 {
 					/* VDD_DSPEVE, VDD_IVA, VDD_GPU */
 					regulator-name = "smps45";
-					regulator-min-microvolt = < 850000>;
+					regulator-min-microvolt = <850000>;
 					regulator-max-microvolt = <1150000>;
 					regulator-always-on;
 					regulator-boot-on;
@@ -334,8 +354,17 @@
 				};
 
 				ldo3_reg: ldo3 {
-					/* VDDA_1V8_PHY */
+					/* VDDA_1V8_PHYA */
 					regulator-name = "ldo3";
+					regulator-min-microvolt = <1800000>;
+					regulator-max-microvolt = <1800000>;
+					regulator-always-on;
+					regulator-boot-on;
+				};
+
+				ldo4_reg: ldo4 {
+					/* VDDA_1V8_PHYB */
+					regulator-name = "ldo4";
 					regulator-min-microvolt = <1800000>;
 					regulator-max-microvolt = <1800000>;
 					regulator-always-on;
@@ -377,13 +406,6 @@
 			};
 		};
 
-		tps659038_rtc: tps659038_rtc {
-			compatible = "ti,palmas-rtc";
-			interrupt-parent = <&tps659038>;
-			interrupts = <8 IRQ_TYPE_NONE>;
-			wakeup-source;
-		};
-
 		tps659038_pwr_button: tps659038_pwr_button {
 			compatible = "ti,palmas-pwrbutton";
 			interrupt-parent = <&tps659038>;
@@ -391,31 +413,25 @@
 			wakeup-source;
 			ti,palmas-long-press-seconds = <13>;
 		};
+
+		tps659038_rtc: tps659038_rtc {
+			compatible = "ti,palmas-rtc";
+			interrupt-parent = <&tps659038>;
+			interrupts = <8 IRQ_TYPE_NONE>;
+			wakeup-source;
+			status = "disabled";
+		};
 	};
 
 	i2c_eeprom: eeprom@50 {
+		status = "disabled";
 		compatible = "at,24c32";
-		reg = <0x52>;
+		reg = <0x50>;
 		pagesize = <32>;
-		status = "disabled";
-	};
-
-// TODO: [RR] implement actual rtc settings in driver
-	i2c_rtc: rtc@68 {
-		compatible = "mc,rv4162c7";
-		pinctrl-0 = <&i2c_rtc_pins_default>;
-		reg = <0x68>;
-
-		interrupt-parent = <&gpio1>;
-		interrupts = <1 IRQ_TYPE_LEVEL_LOW>
-		interrupt-controller;
-		wakeup-source;
-
-		status = "disabled";
 	};
 };
 
-&gpio7 {
+&gpio4 {
 	ti,no-reset-on-init;
 	ti,no-idle-on-init;
 };
@@ -449,14 +465,19 @@
 	status = "okay";
 	slaves = <1>;
 	pinctrl-names = "default", "sleep";
-	pinctrl-0 = <&cpsw_emac0_pins_default>;
-	pinctrl-1 = <&cpsw_emac0_pins_sleep>;
+	pinctrl-0 = <&emac0_pins_default>;
+	pinctrl-1 = <&emac0_pins_sleep>;
+	ti,no-idle;
 };
 
 &cpsw_emac0 {
 	phy_id = <&davinci_mdio>, <1>;
 	phy-mode = "rgmii";
 	dual_emac_res_vlan = <1>;
+	status = "disabled";
+};
+
+&cpsw_emac1 {
 	status = "disabled";
 };
 
@@ -468,10 +489,11 @@
 };
 
 &mmc2 {
-	status = "okay";
-	pinctrl-names = "default", "sleep";
+	status = "disabled";
+	pinctrl-names = "default", "sleep", "hs";
 	pinctrl-0 = <&mmc2_pins_default>;
 	pinctrl-1 = <&mmc2_pins_sleep>;
+	pinctrl-2 = <&mmc2_pins_hs>;
 	vmmc-supply = <&vdd_3v3>;
 	bus-width = <8>;
 	ti,non-removable;
@@ -542,6 +564,14 @@
 	status = "okay";
 };
 
+&ipu1 {
+	status = "okay";
+	memory-region = <&ipu1_cma_pool>;
+	mboxes = <&mailbox5 &mbox_ipu1_legacy>;
+	timers = <&timer11>;
+	watchdog-timers = <&timer7>, <&timer8>;
+};
+
 &ipu2 {
 	status = "okay";
 	memory-region = <&ipu2_cma_pool>;
@@ -550,18 +580,12 @@
 	watchdog-timers = <&timer4>, <&timer9>;
 };
 
-&ipu1 {
-	status = "okay";
-	memory-region = <&ipu1_cma_pool>;
-	mboxes = <&mailbox5 &mbox_ipu1_legacy>;
-	timers = <&timer11>;
-};
-
 &dsp1 {
 	status = "okay";
 	memory-region = <&dsp1_cma_pool>;
 	mboxes = <&mailbox5 &mbox_dsp1_legacy>;
 	timers = <&timer5>;
+	watchdog-timers = <&timer10>;
 };
 
 &dsp2 {
@@ -596,3 +620,4 @@
 		status = "okay";
 	};
 };
+#include "am57xx-evm-cmem.dtsi"
