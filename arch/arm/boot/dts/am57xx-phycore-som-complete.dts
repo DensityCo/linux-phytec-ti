@@ -92,6 +92,47 @@
 		regulator-always-on;
 		regulator-boot-on;
 		enable-active-high;
+		gpio = <&gpio4 8 GPIO_ACTIVE_HIGH>;
+	};
+
+	hdmi0: connector@1 {
+		compatible = "omapdss,hdmi-connector";
+		label = "hdmi";
+
+		type = "a";
+
+		port {
+			hdmi_connector_in: endpoint {
+				remote-endpoint = <&tpd12s521_out>;
+			};
+		};
+	};
+
+	tpd12s521: encoder@1 {
+		compatible = "omapdss,ti,tpd12s521";
+
+		gpios = <&gpio7 12 GPIO_ACTIVE_HIGH>;	/* gpio7_12/sp1_cs2, HPD */
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+
+				tpd12s521_in: endpoint@0 {
+					remote-endpoint = <&hdmi_out>;
+				};
+			};
+
+			port@1 {
+				reg = <1>;
+
+				tpd12s521_out: endpoint@0 {
+					remote-endpoint = <&hdmi_connector_in>;
+				};
+			};
+		};
 	};
 
 	leds {
@@ -344,6 +385,12 @@
 	tps659038_pins_default: tps659038_pins_default {
 		pinctrl-single,pins = <
 			0x418 (PIN_INPUT_PULLUP | MUX_MODE14)	/* wakeup0.gpio1_0 */
+		>;
+	};
+
+	hdmi_pins: pinmux_hdmi_pins {
+		pinctrl-single,pins = <
+			0x3b8 	(PIN_INPUT | MUX_MODE14) /* spi1_cs2.gpio7_12 */
 		>;
 	};
 
@@ -658,6 +705,25 @@
 	bus-width = <8>;
 	ti,non-removable;
 	cap-mmc-dual-data-rate;
+};
+
+&dss {
+	status = "okay";
+
+	vdda_video-supply = <&ldoln_reg>;
+};
+
+&hdmi {
+	status = "okay";
+	vdda-supply = <&ldo3_reg>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&hdmi_pins &i2c2_pins>;
+
+	port {
+		hdmi_out: endpoint {
+			remote-endpoint = <&tpd12s521_in>;
+		};
+	};
 };
 
 &mailbox3 {
