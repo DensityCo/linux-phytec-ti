@@ -178,6 +178,29 @@
 		gpios = <&gpio8 6 GPIO_ACTIVE_HIGH>;
 		cable-name = "USB-HOST";
 	};
+
+	sound {
+		compatible = "phytec,pcm-948-audio";
+
+		ti,model = "phyCORE-AM57xx-RDK";
+		ti,audio-codec = <&tlv320aic3007>;
+		ti,mcasp-controller = <&mcasp1>;
+		clocks = <&clkout2_clk>;
+		clock-names = "mclk";
+		ti,audio-routing =
+			"Line Out",	"LLOUT",
+			"Line Out",	"RLOUT",
+
+			"LINE1R",	"Line In",
+			"LINE1R",	"Line In",
+
+			"MIC3L",	"Mic Jack",
+			"MIC3R",	"Mic Jack",
+			"Mic Jack",	"Mic Bias",
+
+			"Headphone Jack","HPLOUT",
+			"Headphone Jack","HPROUT";
+	};
 };
 
 &dra7_pmx_core {
@@ -222,15 +245,15 @@
 
 	i2c4_pins_default: i2c4_pins_default {
 		pinctrl-single,pins = <
-			0x040 (PIN_INPUT_PULLUP | MUX_MODE7)	/* gpmc_a0.i2c4_scl */
-			0x044 (PIN_INPUT_PULLUP | MUX_MODE7)	/* gpmc_a1.i2c4_sda */
+			0x40 (PIN_INPUT_PULLUP | MUX_MODE7)	/* gpmc_a0.i2c4_scl */
+			0x44 (PIN_INPUT_PULLUP | MUX_MODE7)	/* gpmc_a1.i2c4_sda */
 		>;
 	};
 
 	i2c4_pins_sleep: i2c4_pins_sleep {
 		pinctrl-single,pins = <
-			0x040 (PIN_INPUT | MUX_MODE15)
-			0x044 (PIN_INPUT | MUX_MODE15)
+			0x40 (PIN_INPUT | MUX_MODE15)
+			0x44 (PIN_INPUT | MUX_MODE15)
 		>;
 	};
 
@@ -424,6 +447,23 @@
 		>;
 	};
 
+	mcasp1_pins_default: mcasp1_pins_default {
+		pinctrl-single,pins = <
+			0x2a4 (PIN_INPUT_PULLDOWN | MUX_MODE0) /* mcasp1_aclkx.aclkx */
+			0x2a8 (PIN_INPUT_PULLDOWN | MUX_MODE0) /* mcasp1_fsx.fsx */
+			0x2ec (PIN_OUTPUT_PULLDOWN | MUX_MODE0) /* mcasp1_axr14.axr14 */
+			0x2f0 (PIN_INPUT_PULLDOWN | MUX_MODE0) /* mcasp1_axr15.axr15 */
+		>;
+	};
+
+	mcasp1_pins_sleep: mcasp1_pins_sleep {
+		pinctrl-single,pins = <
+			0x2a4 (PIN_INPUT | MUX_MODE15)
+			0x2a8 (PIN_INPUT | MUX_MODE15)
+			0x2ec (PIN_INPUT | MUX_MODE15)
+			0x2f0 (PIN_INPUT | MUX_MODE15)
+		>;
+	};
 };
 
 &i2c1 {
@@ -591,6 +631,21 @@
 	pinctrl-0 = <&i2c4_pins_default>;
 	pinctrl-1 = <&i2c4_pins_sleep>;
 	clock-frequency = <400000>;
+
+	tlv320aic3007: tlv320aic3007@18 {
+		compatible = "ti,tlv320aic3007";
+		reg = <0x18>;
+		pinctrl-names = "default", "sleep";
+		pinctrl-0 = <&clkout2_pins_default>;
+		pinctrl-1 = <&clkout2_pins_sleep>;
+		status = "okay";
+		ai3x-micbias-vg = <2>;
+
+		AVDD-supply = <&vdd_3v3>;
+		IOVDD-supply = <&vdd_3v3>;
+		DRVDD-supply = <&vdd_3v3>;
+		DVDD-supply = <&aic_dvdd>;
+	};
 
 	stmpe811: stmpe811@41 {
 		compatible = "st,stmpe811";
@@ -796,6 +851,23 @@
 	dr_mode = "host";
 	pinctrl-names = "default";
 	pinctrl-0 = <&usb2_pins>;
+};
+
+&mcasp1 {
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&mcasp1_pins_default>;
+	pinctrl-1 = <&mcasp1_pins_sleep>;
+	status = "okay";
+
+	op-mode = <0>;  /* MCASP_IIS_MODE */
+	tdm-slots = <2>;
+	/* mcasp1_axr14 = TX, mcasp1_axr15 = RX */
+	serial-dir = <  /* 0: INACTIVE, 1: TX, 2: RX */
+		0 0 0 0
+		0 0 0 0
+		0 0 0 0
+		0 0 1 2
+	>;
 };
 
 &pruss1 {
