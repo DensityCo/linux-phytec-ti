@@ -447,6 +447,20 @@
 		>;
 	};
 
+	dcan1_pins: dcan1_pins {
+		pinctrl-single,pins = <
+			0x3d0 (PIN_OUTPUT_PULLUP | MUX_MODE0) /* dcan1_tx.tx */
+			0x3d4 (PIN_INPUT_PULLUP | MUX_MODE0) /* dcan1_rx.rx */
+		>;
+	};
+
+	dcan2_pins: dcan2_pins {
+		pinctrl-single,pins = <
+			0x288 (PIN_OUTPUT_PULLUP | MUX_MODE2) /* gpio6_14.dcan2_tx */
+			0x28c (PIN_INPUT_PULLUP | MUX_MODE2) /* gpio6_15.dcan2_rx */
+		>;
+	};
+
 	mcasp1_pins_default: mcasp1_pins_default {
 		pinctrl-single,pins = <
 			0x2a4 (PIN_INPUT_PULLDOWN | MUX_MODE0) /* mcasp1_aclkx.aclkx */
@@ -855,6 +869,18 @@
 	dr_mode = "host";
 	pinctrl-names = "default";
 	pinctrl-0 = <&usb2_pins>;
+};
+
+&dcan1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&dcan1_pins>;
+	status = "okay";
+};
+
+&dcan2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&dcan2_pins>;
+	status = "okay";
 };
 
 &mcasp1 {
