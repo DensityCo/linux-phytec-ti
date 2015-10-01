@@ -85,6 +85,20 @@
 			"Headphone Jack","HPLOUT",
 			"Headphone Jack","HPROUT";
 	};
+
+	gpio_fan: gpio_fan {
+		compatible = "gpio-fan";
+		pinctrl-names = "default";
+		pinctrl-0 = <&fan_pins_default>;
+
+		gpios =  <&gpio7 5 GPIO_ACTIVE_HIGH>;
+		gpio-fan,speed-map = <0    0
+				      13000 1>;
+		cooling-min-state = <0>;
+		cooling-max-state = <1>;
+		#cooling-cells = <2>;
+	};
+
 };
 
 &dra7_pmx_core {
@@ -99,6 +113,12 @@
 		pinctrl-single,pins = <
 			0x58 (PIN_INPUT_PULLDOWN | MUX_MODE15)
 			0x5c (PIN_INPUT_PULLDOWN | MUX_MODE15)
+		>;
+	};
+
+	fan_pins_default: fan_pins_default {
+		pinctrl-single,pins = <
+			0x48 (PIN_OUTPUT | MUX_MODE14)	/* gpmc_a2.gpio7_5 */
 		>;
 	};
 
@@ -618,4 +638,27 @@
 		0 0 0 0
 		0 0 1 2
 	>;
+};
+
+&cpu_trips {
+	cpu_alert1: cpu_alert1 {
+		temperature = <40000>; /* millicelsius */
+		hysteresis = <2000>; /* millicelsius */
+		type = "active";
+	};
+};
+
+&cpu_alert0 {
+	temperature = <75000>;
+};
+
+&cpu_crit {
+	temperature = <85000>;
+};
+
+&cpu_cooling_maps {
+	map1 {
+		trip = <&cpu_alert1>;
+		cooling-device = <&gpio_fan THERMAL_NO_LIMIT THERMAL_NO_LIMIT>;
+	};
 };
