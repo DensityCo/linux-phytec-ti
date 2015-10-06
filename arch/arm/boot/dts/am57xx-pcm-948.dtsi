@@ -101,6 +101,8 @@
 		gpios =  <&gpio7 5 GPIO_ACTIVE_HIGH>;
 		gpio-fan,speed-map = <0    0
 				      13000 1>;
+		cooling-min-state = <0>;
+		cooling-max-state = <1>;
 		#cooling-cells = <2>;
 	};
 
@@ -631,14 +633,14 @@
 
 &cpu_trips {
 	cpu_alert1: cpu_alert1 {
-		temperature = <50000>; /* millicelsius */
+		temperature = <40000>; /* millicelsius */
 		hysteresis = <2000>; /* millicelsius */
 		type = "active";
 	};
 };
 
 &cpu_alert0 {
-	temperature = <50000>;
+	temperature = <75000>;
 };
 
 &cpu_crit {
