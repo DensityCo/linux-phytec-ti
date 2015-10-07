@@ -71,6 +71,13 @@ config THERMAL_DEFAULT_GOV_USER_SPACE
 	  Select this if you want to let the user space manage the
 	  platform thermals.
 
+config THERMAL_DEFAULT_GOV_TWO_STAGE
+	bool "two_stage"
+	select THERMAL_GOV_TWO_STAGE
+	help
+	  Use the two_stage governor as default. This is used to
+	  enable or disable devices with only two stages.
+
 endchoice
 
 config THERMAL_GOV_FAIR_SHARE
@@ -88,6 +95,11 @@ config THERMAL_GOV_USER_SPACE
 	bool "User_space thermal governor"
 	help
 	  Enable this to let the user space manage the platform thermals.
+
+config THERMAL_GOV_TWO_STAGE
+	bool "Two_stage thermal governor"
+	help
+	  Enable this to manage platform thermals using a two-stage governor.
 
 config CPU_THERMAL
 	bool "generic cpu cooling support"
