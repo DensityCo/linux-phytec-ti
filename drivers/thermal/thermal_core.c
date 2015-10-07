@@ -2078,7 +2078,11 @@ static int __init thermal_register_governors(void)
 	if (result)
 		return result;
 
-	return thermal_gov_power_allocator_register();
+	result = thermal_gov_power_allocator_register();
+	if (result)
+		return result;
+
+	return thermal_gov_two_stage_register();
 }
 
 static void thermal_unregister_governors(void)
@@ -2088,6 +2092,7 @@ static void thermal_unregister_governors(void)
 	thermal_gov_bang_bang_unregister();
 	thermal_gov_user_space_unregister();
 	thermal_gov_power_allocator_unregister();
+	thermal_gov_two_stage_unregister();
 }
 
 static int __init thermal_init(void)
