@@ -878,3 +878,4 @@
 	status = "okay";
 	ext-clk-src;
 };
+#include "am57xx-evm-cmem.dtsi"
