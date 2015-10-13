@@ -424,9 +424,12 @@
 	tps659038_usb: tps659038_usb {
 		status = "disabled";
 		compatible = "ti,palmas-usb-vid";
+		pinctrl-names = "default";
+		pinctrl-0 = <&extcon_pins_default>;
+		id-gpios = <&gpio8 6 GPIO_ACTIVE_HIGH>;
+
 		ti,enable-vbus-detection;
 		ti,enable-id-detection;
-		id-gpios = <&gpio8 6 GPIO_ACTIVE_HIGH>;
 	};
 };
 
