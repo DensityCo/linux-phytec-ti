@@ -15,6 +15,19 @@
 		device_type = "memory";
 		reg = <0x80000000 0x80000000>; /* 2GiB */
 	};
+
+	aliases {
+	/* FIXME: RR - HDMI, DSS, and LCD are disabled until
+	 *             the omapdrm-pvr build issues are resolved
+	 */
+/*
+		display0 = &hdmi0;
+		sound0 = &hdmi;
+
+		display1 = &lcd0;
+		sound1 = &rdk_audio;
+*/
+	};
 };
 
 /**** SOM - pcm057 ****/
@@ -70,26 +83,33 @@
 	status = "okay";
 };
 
+/* FIXME: RR - HDMI, DSS, and LCD are disabled until
+ *             the omapdrm-pvr build issues are resolved
+ */
+&dss {
+	status = "disabled";
+};
+
 /* LCD-018 display: enable lcd0, backlight, and ft5406 */
 &lcd0 {
-	status = "okay";
+	status = "disabled";
 };
 &backlight {
-	status = "okay";
+	status = "disabled";
 };
 &ft5406 {
-	status = "okay";
+	status = "disabled";
 };
 
 /* HDMI: enable hdmi, hdmi0 and tpd12s521 */
 &tpd12s521 {
-	status = "okay";
+	status = "disabled";
 };
 &hdmi {
-	status = "okay";
+	status = "disabled";
 };
-&tpd12s521 {
-	status = "okay";
+&hdmi0 {
+	status = "disabled";
 };
 
 &pcie1 {
