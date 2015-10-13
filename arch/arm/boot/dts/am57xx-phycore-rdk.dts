@@ -58,6 +58,10 @@
 	status = "okay";
 };
 
+&dss {
+	status = "okay";
+};
+
 /* LCD-018 display: enable lcd0, backlight, and ft5406 */
 &lcd0 {
 	status = "okay";
@@ -69,7 +73,10 @@
 	status = "okay";
 };
 
-/* HDMI: enable hdmi and tpd12s521 */
+/* HDMI: enable hdmi, hdmi0 and tpd12s521 */
+&tpd12s521 {
+	status = "okay";
+};
 &hdmi {
 	status = "okay";
 };

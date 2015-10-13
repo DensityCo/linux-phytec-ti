@@ -124,8 +124,8 @@
 
 	i2c2_pins: pinmux_i2c2_pins {
 		pinctrl-single,pins = <
-			0x408 (PIN_INPUT | MUX_MODE1) /* hdmi1_ddc_scl */
-			0x40c (PIN_INPUT | MUX_MODE1) /* hdmi1_ddc_sda */
+			0x408 (PIN_INPUT | MUX_MODE1)	/* hdmi1_ddc_scl */
+			0x40c (PIN_INPUT | MUX_MODE1)	/* hdmi1_ddc_sda */
 		>;
 	};
 
@@ -280,7 +280,8 @@
 
 	hdmi_pins: pinmux_hdmi_pins {
 		pinctrl-single,pins = <
-			0x3b8 	(PIN_INPUT | MUX_MODE14) /* spi1_cs2.gpio7_12 */
+			0x3b8 (PIN_INPUT_PULLDOWN | MUX_MODE14) /* spi1_cs2.gpio7_12 */
+			0x3bc (PIN_INPUT_SLEW | MUX_MODE6)      /* spi1_cs3.hdmi1_cec */
 		>;
 	};
 
@@ -555,7 +556,6 @@
 };
 
 &dss {
-	status = "okay";
 	vdda_video-supply = <&ldoln_reg>;
 };
 
