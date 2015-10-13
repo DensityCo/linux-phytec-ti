@@ -366,7 +366,7 @@ static int __init dra7xx_pcie_probe(struct platform_device *pdev)
 	struct phy **phy;
 	void __iomem *base;
 	struct resource *res;
-	struct gpio_desc *reset;
+	struct gpio_desc *reset, *clk_oe;
 	struct dra7xx_pcie *dra7xx;
 	struct device *dev = &pdev->dev;
 	struct device_node *np = dev->of_node;
@@ -438,10 +438,22 @@ static int __init dra7xx_pcie_probe(struct platform_device *pdev)
 		goto err_get_sync;
 	}
 
-	reset = devm_gpiod_get_optional(dev, "pcie-reset", GPIOD_OUT_HIGH);
+	clk_oe = devm_gpiod_get_optional(dev, "pcie-clk-oe", GPIOD_OUT_HIGH);
+	if (IS_ERR(clk_oe)) {
+		ret = PTR_ERR(clk_oe);
+		dev_err(&pdev->dev, "gpio%d request failed, ret %d\n",
+				clk_oe, ret);
+		goto err_gpio;
+	}
+
+	if (of_property_read_bool(np, "pcie-reset-active-low"))
+		reset = devm_gpiod_get_optional(dev, "pcie-reset", GPIOD_OUT_LOW);
+	else
+		reset = devm_gpiod_get_optional(dev, "pcie-reset", GPIOD_OUT_HIGH);
 	if (IS_ERR(reset)) {
 		ret = PTR_ERR(reset);
 		dev_err(&pdev->dev, "gpio request failed, ret %d\n", ret);
+
 		goto err_gpio;
 	}
 
