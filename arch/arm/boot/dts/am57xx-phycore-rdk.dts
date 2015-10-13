@@ -137,11 +137,11 @@
 
 /* AUDIO: enable mcasp1, tlv320aic3007, and rdk_audio */
 &mcasp1 {
-	status = "okay";
+	status = "disabled";
 };
 &tlv320aic3007 {
-	status = "okay";
+	status = "disabled";
 };
 &rdk_audio {
-	status = "okay";
+	status = "disabled";
 };
