@@ -6,15 +6,8 @@
  * published by the Free Software Foundation.
  */
 / {
-	model = "PHYTEC AM57xx PCM-958";
-	compatible = "phytec,am57xx-pcm-958", "phytec,am57xx-phycore-som", "ti,am5728", "ti,dra742", "ti,dra74", "ti,dra7";
-
-	aliases {
-		display0 = &lcd0;
-		display1 = &hdmi0;
-		sound0 = &rdk_audio;
-		sound1 = &hdmi;
-	};
+	model = "PHYTEC AM57xx PCM-948";
+	compatible = "phytec,am57xx-pcm-948", "phytec,am57xx-phycore-som", "ti,am5728", "ti,dra742", "ti,dra74", "ti,dra7";
 
 	wlan_fixed: fixedregulator-wlan {
 		compatible = "regulator-fixed";
