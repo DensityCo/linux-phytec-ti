@@ -417,7 +417,7 @@
 		DVDD-supply = <&aic_dvdd>;
 	};
 
-	ft5406: cap-touch@38 {
+	ft5406: ft5406@38 {
 		pinctrl-names = "default";
 		pinctrl-0 = <&edt_ts_irq_pin>;
 		interrupt-parent = <&gpio8>;
@@ -425,7 +425,7 @@
 		status = "disabled";
 	};
 
-	stmpe811: res-touch@41 {
+	stmpe811: stmpe811@41 {
 		compatible = "st,stmpe811";
 		status = "disabled";
 		reg = <0x41>;
@@ -447,21 +447,6 @@
 			st,settling = <2>;
 			st,fraction-z = <7>;
 			st,i-drive = <1>;
-		};
-	};
-};
-
-&dss {
-	ports {
-		#address-cells = <1>;
-		#size-cells = <0>;
-		port {
-			reg = <0>;
-
-			dpi_out: endpoint {
-				remote-endpoint = <&lcd_in>;
-				data-lines = <24>;
-			};
 		};
 	};
 };

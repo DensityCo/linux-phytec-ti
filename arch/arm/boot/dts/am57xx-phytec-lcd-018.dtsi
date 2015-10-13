@@ -85,18 +85,38 @@
 			vsync-len = <2>;
 			hsync-active = <1>;
 			vsync-active = <1>;
+			de-active = <1>;
+			pixelclk-active = <1>;
 		};
-
+/*
 		port {
 			lcd_in: endpoint {
 				remote-endpoint = <&dpi_out>;
 			};
 		};
+*/
 	};
+};
+
+&dss {
+/*
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		port {
+			reg = <0>;
+
+			dpi_out: endpoint {
+				remote-endpoint = <&lcd_in>;
+				data-lines = <24>;
+			};
+		};
+	};
+*/
 };
 
 &ft5406 {
 	compatible = "edt,edt-ft5406";
 	reg = <0x38>;
-	status = "okay";
+	status = "disabled";
 };
