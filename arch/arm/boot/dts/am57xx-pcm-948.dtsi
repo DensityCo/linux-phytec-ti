@@ -303,12 +303,23 @@
 	usb1_pins: pinmux_usb1_pins {
 		pinctrl-single,pins = <
 			0x280 (PIN_INPUT_SLEW | MUX_MODE0) /* usb1_drvvbus */
+			0x22c (PIN_INPUT | MUX_MODE14)     /* vout1_d20.gpio8_20 */
 		>;
 	};
 
-	usb2_pins: pinmux_usb2_pins {
+	usb2_pins_default: pinmux_usb2_pins_default {
 		pinctrl-single,pins = <
+			0x1d0 (PIN_INPUT | MUX_MODE14)	   /* vout1_fld.gpio4_21 */
 			0x284 (PIN_INPUT_SLEW | MUX_MODE0) /* usb2_drvvbus */
+			0x230 (PIN_INPUT | MUX_MODE14)     /* vout1_d21.gpio8_21 */
+		>;
+	};
+
+	usb2_pins_sleep: pinmux_usb2_pins_sleep {
+		pinctrl-single,pins = <
+			0x1d0 (PIN_INPUT | MUX_MODE14)	   /* vout1_fld.gpio4_21 */
+			0x284 (PIN_INPUT_SLEW | MUX_MODE15) /* usb2_drvvbus */
+			0x230 (PIN_INPUT | MUX_MODE14)     /* vout1_d21.gpio8_21 */
 		>;
 	};
 
@@ -622,8 +633,9 @@
 
 &usb2 {
 	status = "disabled";
-	pinctrl-names = "default";
-	pinctrl-0 = <&usb2_pins>;
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&usb2_pins_default>;
+	pinctrl-1 = <&usb2_pins_sleep>;
 };
 
 &dcan1 {
