@@ -94,7 +94,6 @@
 
 &pcie1 {
 	status = "okay";
-	gpios = <&gpio8 5 GPIO_ACTIVE_LOW>;
 };
 &sata {
 	status = "okay";

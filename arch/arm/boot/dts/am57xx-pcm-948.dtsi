@@ -379,6 +379,16 @@
 			0x238 (PIN_OUTPUT_PULLDOWN | MUX_MODE14) /* vout1_d23.gpio8_23 */
 		>;
 	};
+
+	pcie1_pins: pcie1_pins {
+		pinctrl-single,pins = <
+			0x1e8 (PIN_INPUT | MUX_MODE14)	/* vout1_d3.gpio8_3 */
+			0x1ec (PIN_OUTPUT_PULLDOWN | MUX_MODE14) /* vout1_d4.gpio8_4 */
+			0x1f0 (PIN_INPUT | MUX_MODE14)	/* vout1_d5.gpio8_5 */
+			0x1f8 (PIN_OUTPUT | MUX_MODE14)	/* vout1_d7.gpio8_7 */
+		>;
+	};
+
 };
 
 &phytec_leds {
@@ -582,7 +592,12 @@
 
 &pcie1 {
 	status = "disabled";
-	gpios = <&gpio8 5 GPIO_ACTIVE_LOW>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pcie1_pins>;
+
+	pcie-reset-active-low;
+	pcie-clk-oe-gpio = <&gpio8 7 GPIO_ACTIVE_HIGH>;
+	pcie-reset-gpio = <&gpio8 4 GPIO_ACTIVE_HIGH>; /* PWRGD (X27-A11) */
 };
 
 &usb2_phy1 {
