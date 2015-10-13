@@ -92,9 +92,8 @@
 	status = "okay";
 };
 
-&pcie1 {
+&pcie1_rc {
 	status = "okay";
-	gpios = <&gpio8 5 GPIO_ACTIVE_LOW>;
 };
 &sata {
 	status = "okay";
