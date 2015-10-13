@@ -46,6 +46,14 @@
 	status = "okay";
 };
 
+&dcan1 {
+	status = "okay";
+};
+
+&dcan2 {
+	status = "okay";
+};
+
 &cpsw_emac1 {
 	status = "okay";
 };
