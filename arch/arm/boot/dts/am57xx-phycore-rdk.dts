@@ -99,17 +99,20 @@
 	status = "okay";
 };
 
-/* USB3.0 host: enable usb1 and omap_dwc3_2 */
+/* USB3.0 host: enable usb1 */
 &usb1 {
+	status = "okay";
+};
+/* USB2.0: enable tps659038_usb, omap_dwc3_2, and usb2 */
+&tps659038_usb {
 	status = "okay";
 };
 &omap_dwc3_2 {
 	status = "okay";
-	extcon = <&tps659038_usb>;
 };
 &usb2 {
 	status = "okay";
-	dr_mode = "peripheral"; /* can be configured as host */
+	dr_mode = "otg"; /* peripheral, host, or otg */
 };
 
 /* AUDIO: enable mcasp1, tlv320aic3007, and rdk_audio */
