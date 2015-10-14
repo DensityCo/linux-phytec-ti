@@ -15,6 +15,19 @@
 		device_type = "memory";
 		reg = <0x80000000 0x80000000>; /* 2GiB */
 	};
+
+	aliases {
+	/* FIXME: RR - HDMI, DSS, and LCD are disabled until
+	 *             the omapdrm-pvr build issues are resolved
+	 */
+/*
+		display0 = &hdmi0;
+		sound0 = &hdmi;
+
+		display1 = &lcd0;
+		sound1 = &rdk_audio;
+*/
+	};
 };
 
 /**** SOM - pcm057 ****/
@@ -46,6 +59,14 @@
 	status = "okay";
 };
 
+&dcan1 {
+	status = "okay";
+};
+
+&dcan2 {
+	status = "okay";
+};
+
 &cpsw_emac1 {
 	status = "okay";
 };
@@ -58,50 +79,62 @@
 	status = "okay";
 };
 
-/* LCD-018 display: enable lcd0, backlight, and ft5406 */
-&lcd0 {
-	status = "okay";
-};
-&backlight {
-	status = "okay";
-};
-&ft5406 {
-	status = "okay";
+/* FIXME: RR - HDMI, DSS, and LCD are disabled until
+ *             the omapdrm-pvr build issues are resolved
+ */
+&dss {
+	status = "disabled";
 };
 
-/* HDMI: enable hdmi and tpd12s521 */
-&hdmi {
-	status = "okay";
+/* LCD-018 display: enable lcd0, backlight, and ft5406 */
+&lcd0 {
+	status = "disabled";
 };
+&backlight {
+	status = "disabled";
+};
+&ft5406 {
+	status = "disabled";
+};
+
+/* HDMI: enable hdmi, hdmi0 and tpd12s521 */
 &tpd12s521 {
-	status = "okay";
+	status = "disabled";
+};
+&hdmi {
+	status = "disabled";
+};
+&hdmi0 {
+	status = "disabled";
 };
 
 &pcie1 {
 	status = "okay";
-	gpios = <&gpio8 5 GPIO_ACTIVE_LOW>;
 };
 
-/* USB3.0 host: enable usb1 and omap_dwc3_2 */
+/* USB3.0 host: enable usb1 */
 &usb1 {
+	status = "okay";
+};
+/* USB2.0: enable tps659038_usb, omap_dwc3_2, and usb2 */
+&tps659038_usb {
 	status = "okay";
 };
 &omap_dwc3_2 {
 	status = "okay";
-	extcon = <&tps659038_usb>;
 };
 &usb2 {
 	status = "okay";
-	dr_mode = "peripheral"; /* can be configured as host */
+	dr_mode = "otg"; /* peripheral, host, or otg */
 };
 
 /* AUDIO: enable mcasp1, tlv320aic3007, and rdk_audio */
 &mcasp1 {
-	status = "okay";
+	status = "disabled";
 };
 &tlv320aic3007 {
-	status = "okay";
+	status = "disabled";
 };
 &rdk_audio {
-	status = "okay";
+	status = "disabled";
 };

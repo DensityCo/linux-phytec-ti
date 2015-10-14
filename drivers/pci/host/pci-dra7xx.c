@@ -359,7 +359,7 @@ static int __init dra7xx_pcie_probe(struct platform_device *pdev)
 	struct device *dev = &pdev->dev;
 	struct device_node *np = dev->of_node;
 	char name[10];
-	int gpio_sel;
+	int gpio_sel, clk_oe;
 	enum of_gpio_flags flags;
 	unsigned long gpio_flags;
 
@@ -418,6 +418,19 @@ static int __init dra7xx_pcie_probe(struct platform_device *pdev)
 	if (IS_ERR_VALUE(ret)) {
 		dev_err(dev, "pm_runtime_get_sync failed\n");
 		goto err_get_sync;
+	}
+
+	clk_oe = of_get_gpio_flags(dev->of_node, 1, &flags);
+	if (gpio_is_valid(clk_oe)) {
+		gpio_flags = (flags & OF_GPIO_ACTIVE_LOW) ?
+				GPIOF_OUT_INIT_LOW : GPIOF_OUT_INIT_HIGH;
+		ret = devm_gpio_request_one(dev, clk_oe, gpio_flags,
+					    "pcie_clk_oe");
+		if (ret) {
+			dev_err(&pdev->dev, "gpio%d request failed, ret %d\n",
+				clk_oe, ret);
+			goto err_gpio;
+		}
 	}
 
 	gpio_sel = of_get_gpio_flags(dev->of_node, 0, &flags);
