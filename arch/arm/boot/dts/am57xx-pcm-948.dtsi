@@ -585,8 +585,9 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pcie1_pins>;
 
-	gpios = <&gpio8 4 GPIO_ACTIVE_HIGH
-		 &gpio8 7 GPIO_ACTIVE_HIGH>;
+	pcie-reset-active-low;
+	pcie-clk-oe-gpio = <&gpio8 7 GPIO_ACTIVE_HIGH>;
+	pcie-reset-gpio = <&gpio8 4 GPIO_ACTIVE_HIGH>; /* PWRGD (X27-A11) */
 };
 
 &usb1 {
