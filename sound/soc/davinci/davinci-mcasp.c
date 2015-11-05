@@ -1546,7 +1546,6 @@ static struct davinci_mcasp_pdata dra7_mcasp_pdata = {
 static struct davinci_mcasp_pdata dra7_mcasp1_pdata = {
 	.tx_dma_offset = 0x238,
 	.rx_dma_offset = 0x2BC,
-	.asp_chan_q = EVENTQ_0,
 	.version = MCASP_VERSION_4,
 };
 
