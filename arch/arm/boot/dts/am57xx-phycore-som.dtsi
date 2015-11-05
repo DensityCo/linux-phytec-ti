@@ -66,7 +66,7 @@
 			interrupts = <GIC_SPI 104 IRQ_TYPE_LEVEL_HIGH>,
 				     <GIC_SPI 103 IRQ_TYPE_LEVEL_HIGH>;
 			interrupt-names = "tx", "rx";
-			dmas = <&sdma 129 &dmacb>, <&sdma 128 &dmacb>;
+			dmas = <&sdma_xbar 129>, <&sdma_xbar 128>;
 			dma-names = "tx", "rx";
 			clocks = <&mcasp1_ahclkr_mux>, <&mcasp1_ahclkx_mux>;
 			clock-names = "ahclkr", "fck";
