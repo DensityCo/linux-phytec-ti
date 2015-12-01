@@ -17,16 +17,11 @@
 	};
 
 	aliases {
-	/* FIXME: RR - HDMI, DSS, and LCD are disabled until
-	 *             the omapdrm-pvr build issues are resolved
-	 */
-/*
 		display0 = &hdmi0;
-		sound0 = &hdmi;
+/*		display0 = &lcd0; */
 
-		display1 = &lcd0;
+		sound0 = &hdmi;
 		sound1 = &rdk_audio;
-*/
 	};
 };
 
@@ -137,11 +132,11 @@
 
 /* AUDIO: enable mcasp1, tlv320aic3007, and rdk_audio */
 &mcasp1 {
-	status = "disabled";
+	status = "okay";
 };
 &tlv320aic3007 {
-	status = "disabled";
+	status = "okay";
 };
 &rdk_audio {
-	status = "disabled";
+	status = "okay";
 };
