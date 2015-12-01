@@ -64,14 +64,15 @@
 	};
 
 	rdk_audio: sound {
-		compatible = "phytec,pcm-948-audio";
+		compatible = "simple-audio-card";
 		status = "disabled";
-		ti,model = "phyCORE-AM57xx-RDK";
-		ti,audio-codec = <&tlv320aic3007>;
-		ti,mcasp-controller = <&mcasp1>;
-		clocks = <&clkout2_clk>;
-		clock-names = "mclk";
-		ti,audio-routing =
+		simple-audio-card,name = "phyCORE-AM57xx-RDK";
+		simple-audio-card,widgets =
+			"Line", "Line Out",
+			"Line", "Line In",
+			"Microphone", "Mic Jack",
+			"Headphone", "HP Jack";
+		simple-audio-card,routing =
 			"Line Out",	"LLOUT",
 			"Line Out",	"RLOUT",
 
@@ -82,8 +83,21 @@
 			"MIC3R",	"Mic Jack",
 			"Mic Jack",	"Mic Bias",
 
-			"Headphone Jack","HPLOUT",
-			"Headphone Jack","HPROUT";
+			"HP Jack",	"HPLOUT",
+			"HP Jack",	"HPROUT";
+		simple-audio-card,format = "dsp_b";
+		simple-audio-card,bitclock-master = <&sound_master>;
+		simple-audio-card,frame-master = <&sound_master>;
+		simple-audio-card,bitclock-inversion;
+
+		simple-audio-card,cpu {
+			sound-dai = <&mcasp1>;
+		};
+
+		sound_master: simple-audio-card,codec {
+			sound-dai = <&tlv320aic3007>;
+			clocks = <&clkout2_clk>;
+		};
 	};
 
 	gpio_fan: gpio_fan {
@@ -316,7 +330,7 @@
 
 	clkout2_pins_default: clkout2_pins_default {
 		pinctrl-single,pins = <
-			0x294 (PIN_OUTPUT_PULLDOWN | MUX_MODE9)	/* xref_clk0.clkout2 */
+			0x294 (PIN_INPUT_PULLDOWN | MUX_MODE9)	/* xref_clk0.clkout2 */
 		>;
 	};
 
@@ -433,6 +447,7 @@
 		pinctrl-1 = <&clkout2_pins_sleep>;
 		status = "disabled";
 		ai3x-micbias-vg = <2>;
+		adc-settle-ms = <40>;
 
 		AVDD-supply = <&vdd_3v3>;
 		IOVDD-supply = <&vdd_3v3>;
@@ -622,6 +637,7 @@
 };
 
 &mcasp1 {
+	#sound-dai-cells = <0>;
 	status = "disabled";
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&mcasp1_pins_default>;
@@ -636,6 +652,8 @@
 		0 0 0 0
 		0 0 1 2
 	>;
+	tx-num-evt = <8>;
+	rx-num-evt = <8>;
 };
 
 &cpu_trips {
