@@ -21,7 +21,7 @@
 		enable-active-high;
 	};
 
-	hdmi0: connector@1 {
+	hdmi0: connector {
 		compatible = "hdmi-connector";
 		status = "disabled";
 		label = "hdmi";
@@ -35,7 +35,7 @@
 		};
 	};
 
-	tpd12s521: encoder@1 {
+	tpd12s521: encoder {
 		compatible = "ti,tpd12s521";
 		status = "disabled";
 
@@ -48,7 +48,7 @@
 			port@0 {
 				reg = <0>;
 
-				tpd12s521_in: endpoint@0 {
+				tpd12s521_in: endpoint {
 					remote-endpoint = <&hdmi_out>;
 				};
 			};
@@ -56,7 +56,7 @@
 			port@1 {
 				reg = <1>;
 
-				tpd12s521_out: endpoint@0 {
+				tpd12s521_out: endpoint {
 					remote-endpoint = <&hdmi_connector_in>;
 				};
 			};
