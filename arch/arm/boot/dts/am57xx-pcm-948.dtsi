@@ -421,13 +421,13 @@
 
 &tps659038 {
 	tps659038_usb: tps659038_usb {
+		status = "disabled";
 		compatible = "ti,palmas-usb-vid";
 		pinctrl-names = "default";
 		pinctrl-0 = <&extcon_pins_default>;
 		ti,enable-vbus-detection;
-		ti,enable-gpio-id-detection;
+		ti,enable-id-detection;
 		id-gpios = <&gpio8 6 GPIO_ACTIVE_HIGH>;
-		status = "disabled";
 	};
 };
 
@@ -603,6 +603,14 @@
 	pcie-reset-active-low;
 	pcie-clk-oe-gpio = <&gpio8 7 GPIO_ACTIVE_HIGH>;
 	pcie-reset-gpio = <&gpio8 4 GPIO_ACTIVE_HIGH>; /* PWRGD (X27-A11) */
+};
+
+&usb2_phy1 {
+       phy-supply = <&ldousb_reg>;
+};
+
+&usb2_phy2 {
+       phy-supply = <&ldousb_reg>;
 };
 
 &usb1 {
