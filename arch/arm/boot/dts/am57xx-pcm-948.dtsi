@@ -547,10 +547,9 @@
 	pinctrl-1 = <&mmc1_pins_sleep>;
 	pinctrl-2 = <&mmc1_pins_hs>;
 	vmmc-supply = <&ldo1_reg>;
-	vmmc_aux-supply = <&vdd_3v3>;
-	pbias-supply = <&pbias_regulator>;
 	bus-width = <4>;
 	cd-gpios = <&gpio6 27 0>; /* gpio 219 */
+	max-frequency = <96000000>;
 };
 
 /* TODO: RR: create am57xx-phytec-wlan.dtsi */
