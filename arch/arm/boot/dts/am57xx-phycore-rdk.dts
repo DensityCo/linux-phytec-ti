@@ -82,7 +82,7 @@
  *             the omapdrm-pvr build issues are resolved
  */
 &dss {
-	status = "disabled";
+	status = "okay";
 };
 
 /* LCD-018 display: enable lcd0, backlight, and ft5406 */
@@ -98,13 +98,13 @@
 
 /* HDMI: enable hdmi, hdmi0 and tpd12s521 */
 &tpd12s521 {
-	status = "disabled";
+	status = "okay";
 };
 &hdmi {
-	status = "disabled";
+	status = "okay";
 };
 &hdmi0 {
-	status = "disabled";
+	status = "okay";
 };
 
 &pcie1 {
