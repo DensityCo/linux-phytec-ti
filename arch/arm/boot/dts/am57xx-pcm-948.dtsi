@@ -440,6 +440,7 @@
 	clock-frequency = <400000>;
 
 	tlv320aic3007: tlv320aic3007@18 {
+		#sound-dai-cells = <0>;
 		compatible = "ti,tlv320aic3007";
 		reg = <0x18>;
 		pinctrl-names = "default", "sleep";

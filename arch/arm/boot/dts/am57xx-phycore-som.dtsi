@@ -51,7 +51,7 @@
 
 		dsp2_cma_pool: dsp2_cma@9f000000 {
 			compatible = "shared-dma-pool";
-			reg = <0x9f000000 0x800000>;
+			reg = <0x9f000000 0x1000000>;
 			reusable;
 			status = "okay";
 		};
@@ -523,20 +523,20 @@
 
 &mailbox5 {
 	status = "okay";
-	mbox_ipu1_legacy: mbox_ipu1_legacy {
+	mbox_ipu1_ipc3x: mbox_ipu1_ipc3x {
 		status = "okay";
 	};
-	mbox_dsp1_legacy: mbox_dsp1_legacy {
+	mbox_dsp1_ipc3x: mbox_dsp1_ipc3x {
 		status = "okay";
 	};
 };
 
 &mailbox6 {
 	status = "okay";
-	mbox_ipu2_legacy: mbox_ipu2_legacy {
+	mbox_ipu2_ipc3x: mbox_ipu2_ipc3x {
 		status = "okay";
 	};
-	mbox_dsp2_legacy: mbox_dsp2_legacy {
+	mbox_dsp2_ipc3x: mbox_dsp2_ipc3x {
 		status = "okay";
 	};
 };
@@ -568,15 +568,14 @@
 &ipu1 {
 	status = "okay";
 	memory-region = <&ipu1_cma_pool>;
-	mboxes = <&mailbox5 &mbox_ipu1_legacy>;
+	mboxes = <&mailbox5 &mbox_ipu1_ipc3x>;
 	timers = <&timer11>;
-	watchdog-timers = <&timer7>, <&timer8>;
 };
 
 &ipu2 {
 	status = "okay";
 	memory-region = <&ipu2_cma_pool>;
-	mboxes = <&mailbox6 &mbox_ipu2_legacy>;
+	mboxes = <&mailbox6 &mbox_ipu2_ipc3x>;
 	timers = <&timer3>;
 	watchdog-timers = <&timer4>, <&timer9>;
 };
@@ -584,15 +583,14 @@
 &dsp1 {
 	status = "okay";
 	memory-region = <&dsp1_cma_pool>;
-	mboxes = <&mailbox5 &mbox_dsp1_legacy>;
+	mboxes = <&mailbox5 &mbox_dsp1_ipc3x>;
 	timers = <&timer5>;
-	watchdog-timers = <&timer10>;
 };
 
 &dsp2 {
 	status = "okay";
 	memory-region = <&dsp2_cma_pool>;
-	mboxes = <&mailbox6 &mbox_dsp2_legacy>;
+	mboxes = <&mailbox6 &mbox_dsp2_ipc3x>;
 	timers = <&timer6>;
 };
 
