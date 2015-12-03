@@ -402,8 +402,7 @@
 };
 
 &phytec_leds {
-		pinctrl-0 = <&leds_som_pins_default &leds_cb_pins_sleep>;
-		pinctrl-1 = <&leds_som_pins_sleep &leds_cb_pins_sleep>;
+		pinctrl-0 = <&leds_som_pins_default &leds_cb_pins_default>;
 
 		led@2 {
 			label = "am57xx-pcm-948:usr1";
