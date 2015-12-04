@@ -503,9 +503,9 @@
 &lcd0 {
 	status = "disabled";
 	pinctrl-names = "default";
-	pinctrl-0 = <&display_en_pin>;
+	pinctrl-0 = <&lcd_pins &display_en_pin>;
 
-	enable-gpios = <&gpio8 23 GPIO_ACTIVE_HIGH>;
+	enable-gpios = <&gpio8 23 GPIO_ACTIVE_LOW>;
 };
 
 &backlight {

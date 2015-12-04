@@ -17,11 +17,11 @@
 	};
 
 	aliases {
-		display0 = &hdmi0;
-/*		display0 = &lcd0; */
+/*		display1 = &hdmi0; */
+		display0 = &lcd0; 
 
-		sound0 = &hdmi;
-		sound1 = &rdk_audio;
+/*		sound1 = &hdmi; */
+		sound0 = &rdk_audio;
 	};
 };
 
@@ -83,24 +83,27 @@
 
 /* LCD-018 display: enable lcd0, backlight, and ft5406 */
 &lcd0 {
-	status = "disabled";
+	status = "okay";
 };
 &backlight {
-	status = "disabled";
+	status = "okay";
 };
 &ft5406 {
-	status = "disabled";
+	status = "okay";
+};
+&lcd_port {
+	status = "okay";
 };
 
 /* HDMI: enable hdmi, hdmi0 and tpd12s521 */
 &tpd12s521 {
-	status = "okay";
+	status = "disabled";
 };
 &hdmi {
-	status = "okay";
+	status = "disabled";
 };
 &hdmi0 {
-	status = "okay";
+	status = "disabled";
 };
 
 &pcie1 {
