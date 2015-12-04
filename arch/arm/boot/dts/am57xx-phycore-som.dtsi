@@ -73,10 +73,6 @@
 			clock-names = "ahclkr", "fck";
 			status = "disabled";
 		};
-
-		gpu: gpu@0x56000000 {
-			gpu0-voltdm = <&voltdm_gpu>;
-		};
 	};
 
 	vdd_3v3: fixedregulator-vdd_3v3 {
@@ -324,11 +320,12 @@
 	tps659038: tps659038@58 {
 		compatible = "ti,tps659038";
 		reg = <0x58>;
-		interrupts-extended = <&gpio1 0 IRQ_TYPE_LEVEL_HIGH
-			       &dra7_pmx_core 0x418>;
 
 		pinctrl-names = "default";
 		pinctrl-0 = <&tps659038_pins_default>;
+
+		interrupt-parent = <&gpio1>;
+		interrupts = <0 IRQ_TYPE_LEVEL_LOW>;
 
 		#interrupt-cells = <2>;
 		interrupt-controller;
@@ -462,17 +459,17 @@
 		tps659038_pwr_button: tps659038_pwr_button {
 			compatible = "ti,palmas-pwrbutton";
 			interrupt-parent = <&tps659038>;
-			interrupts = <1 IRQ_TYPE_NONE>;
+			interrupts = <1 IRQ_TYPE_EDGE_FALLING>;
 			wakeup-source;
-			ti,palmas-long-press-seconds = <13>;
+			ti,palmas-long-press-seconds = <12>;
 		};
 
 		tps659038_rtc: tps659038_rtc {
+			status = "disabled";
 			compatible = "ti,palmas-rtc";
 			interrupt-parent = <&tps659038>;
-			interrupts = <8 IRQ_TYPE_NONE>;
+			interrupts = <8 IRQ_TYPE_EDGE_FALLING>;
 			wakeup-source;
-			status = "disabled";
 		};
 	};
 
@@ -520,7 +517,6 @@
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&emac0_pins_default>;
 	pinctrl-1 = <&emac0_pins_sleep>;
-	ti,no-idle;
 };
 
 &cpsw_emac0 {
@@ -673,5 +669,9 @@
 		mboxes = <&mailbox4 &mbox_pru2_1>;
 		status = "okay";
 	};
+};
+
+&rtc {
+	status = "okay";
 };
 #include "am57xx-evm-cmem.dtsi"
