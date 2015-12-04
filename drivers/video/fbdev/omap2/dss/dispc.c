@@ -3306,11 +3306,11 @@ unsigned long dispc_mgr_lclk_rate(enum omap_channel channel)
 			r = pll->cinfo.clkout[0];
 			break;
 		case OMAP_DSS_CLK_SRC_DSI2_PLL_HSDIV_DISPC:
-			pll = dss_pll_find("dsi1");
+			pll = dss_pll_find("dsi0");
 			if (!pll)
-				pll = dss_pll_find("video1");
+				pll = dss_pll_find("video0");
 
-			r = pll->cinfo.clkout[0];
+			r = pll->cinfo.clkout[2];
 			break;
 		default:
 			BUG();
