@@ -441,8 +441,7 @@ static int __init dra7xx_pcie_probe(struct platform_device *pdev)
 	clk_oe = devm_gpiod_get_optional(dev, "pcie-clk-oe", GPIOD_OUT_HIGH);
 	if (IS_ERR(clk_oe)) {
 		ret = PTR_ERR(clk_oe);
-		dev_err(&pdev->dev, "gpio%d request failed, ret %d\n",
-				clk_oe, ret);
+		dev_err(&pdev->dev, "clk_oe gpio request failed, ret %d\n", ret);
 		goto err_gpio;
 	}
 
