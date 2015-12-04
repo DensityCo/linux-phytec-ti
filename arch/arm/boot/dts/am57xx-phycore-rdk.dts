@@ -106,6 +106,9 @@
 &pcie1 {
 	status = "okay";
 };
+&sata {
+	status = "okay";
+};
 
 /* USB3.0 host: enable usb1 */
 &usb1 {
