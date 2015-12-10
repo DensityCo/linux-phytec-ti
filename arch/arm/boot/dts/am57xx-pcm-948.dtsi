@@ -9,18 +9,6 @@
 	model = "PHYTEC AM57xx PCM-948";
 	compatible = "phytec,am57xx-pcm-948", "phytec,am57xx-phycore-som", "ti,am5728", "ti,dra742", "ti,dra74", "ti,dra7";
 
-	wlan_fixed: fixedregulator-wlan {
-		compatible = "regulator-fixed";
-		regulator-name = "wlan_fixed";
-		/*vin-supply = <&ldo1_reg>;*/
-		regulator-min-microvolt = <1800000>;
-		regulator-max-microvolt = <1800000>;
-
-		/* WLAN_EN GPIO */
-		gpio = <&gpio1 24 0>;
-		enable-active-high;
-	};
-
 	hdmi0: connector {
 		compatible = "hdmi-connector";
 		status = "disabled";
@@ -206,52 +194,30 @@
 		>;
 	};
 
-	mmc3_pins_default: mmc3_pins_default {
+	wlan_pins_default: wlan_pins_default {
 		pinctrl-single,pins = <
-			0x37c (PIN_INPUT_PULLUP | MUX_MODE0) /* mmc3_clk.clk */
-			0x380 (PIN_INPUT_PULLUP | MUX_MODE0) /* mmc3_cmd.cmd */
-			0x384 (PIN_INPUT_PULLUP | MUX_MODE0) /* mmc3_dat0.dat0 */
-			0x388 (PIN_INPUT_PULLUP | MUX_MODE0) /* mmc3_dat1.dat1 */
-			0x38c (PIN_INPUT_PULLUP | MUX_MODE0) /* mmc3_dat2.dat2 */
-			0x390 (PIN_INPUT_PULLUP | MUX_MODE0) /* mmc3_dat3.dat3 */
-		>;
-	};
-
-	mmc3_pins_sleep: mmc3_pins_sleep {
-		pinctrl-single,pins = <
-			0x37c (PIN_INPUT_PULLDOWN | MUX_MODE15)
-			0x380 (PIN_INPUT_PULLDOWN | MUX_MODE15)
-			0x384 (PIN_INPUT_PULLDOWN | MUX_MODE15)
-			0x388 (PIN_INPUT_PULLDOWN | MUX_MODE15)
-			0x38c (PIN_INPUT_PULLDOWN | MUX_MODE15)
-			0x390 (PIN_INPUT_PULLDOWN | MUX_MODE15)
-		>;
-	};
-
-	mmc3_pins_hs: mmc3_pins_hs {
-		pinctrl-single,pins = <
-			0x37c (PIN_INPUT_PULLUP | MUX_VIRTUAL_MODE11 | MUX_MODE0) /* mmc3_clk.clk */
-			0x380 (PIN_INPUT_PULLUP | MUX_VIRTUAL_MODE11 | MUX_MODE0) /* mmc3_cmd.cmd */
-			0x384 (PIN_INPUT_PULLUP | MUX_VIRTUAL_MODE11 | MUX_MODE0) /* mmc3_dat0.dat0 */
-			0x388 (PIN_INPUT_PULLUP | MUX_VIRTUAL_MODE11 | MUX_MODE0) /* mmc3_dat1.dat1 */
-			0x38c (PIN_INPUT_PULLUP | MUX_VIRTUAL_MODE11 | MUX_MODE0) /* mmc3_dat2.dat2 */
-			0x390 (PIN_INPUT_PULLUP | MUX_VIRTUAL_MODE11 | MUX_MODE0) /* mmc3_dat3.dat3 */
-		>;
-	};
-
-	wlan_bt_pins_default: wlan_bt_pins_default {
-		pinctrl-single,pins = <
-			0x394 (PIN_OUTPUT_PULLDOWN | MUX_MODE14) /* mmc3_dat4.gpio1_22 */
 			0x39c (PIN_OUTPUT_PULLDOWN | MUX_MODE14) /* mmc3_dat6.gpio1_24 */
-			0x3a0 (PIN_INPUT_PULLUP | MUX_MODE14)  /* mmc3_dat7.gpio1_25 */
+			0x3a0 (PIN_INPUT_PULLDOWN | MUX_MODE14)  /* mmc3_dat7.gpio1_25 */
 		>;
 	};
 
-	wlan_bt_pins_sleep: wlan_bt_pins_sleep {
+	bt_pins_default: bt_pins_default {
 		pinctrl-single,pins = <
-			0x394 (PIN_INPUT | MUX_MODE15)
-			0x39c (PIN_INPUT | MUX_MODE15)
-			0x3a0 (PIN_INPUT_PULLUP | MUX_MODE14)
+			0x170 (PIN_INPUT_SLEW | MUX_MODE8) /* vin2a_d2.uart10.rxd */
+			0x174 (PIN_INPUT_SLEW | MUX_MODE8) /* vin2a_d3.uart10.txd */
+			0x178 (PIN_INPUT_SLEW | MUX_MODE8) /* vin2a_d4.uart10.ctsn */
+			0x17c (PIN_INPUT_SLEW | MUX_MODE8) /* vin2a_d5.uart10.rtsn */
+			0x394 (PIN_OUTPUT_PULLDOWN | MUX_MODE14) /* mmc3_dat4.gpio1_22 */
+		>;
+	};
+
+	bt_pins_sleep: bt_pins_sleep {
+		pinctrl-single,pins = <
+			0x170 (PIN_INPUT | MUX_MODE15)
+			0x174 (PIN_INPUT | MUX_MODE15)
+			0x178 (PIN_INPUT | MUX_MODE15)
+			0x17c (PIN_INPUT | MUX_MODE15)
+			0x394 (PIN_OUTPUT_PULLUP | MUX_MODE14)
 		>;
 	};
 
@@ -552,29 +518,27 @@
 	max-frequency = <96000000>;
 };
 
-/* TODO: RR: create am57xx-phytec-wlan.dtsi */
-&mmc3 {
-	status = "disabled";
-	pinctrl-names = "default", "sleep", "hs";
-	pinctrl-0 = <&mmc3_pins_default &wlan_bt_pins_default>;
-	pinctrl-1 = <&mmc3_pins_sleep>;
-	pinctrl-2 = <&mmc3_pins_hs &wlan_bt_pins_default>;
-	vmmc-supply = <&wlan_fixed>;
-	bus-width = <4>;
-	ti,non-removable;
-	ti,needs-special-hs-handling;
-	cap-power-off-card;
-	keep-power-in-suspend;
+#include "am57xx-phytec-wlan-wilink8.dtsi"
 
-	#address-cells = <1>;
-	#size-cells = <0>;
-	wlcore: wlcore@0 {
-		status = "disabled";
-		compatible = "ti,wlcore";
-		reg = <2>;
-		interrupt-parent = <&gpio1>;
-		interrupts = <25 IRQ_TYPE_NONE>;
-	};
+&wlan_fixed {
+	pinctrl-names = "default";
+	pinctrl-0 = <&wlan_pins_default>;
+
+	gpio = <&gpio1 24 GPIO_ACTIVE_HIGH>;
+	enable-active-high;
+};
+
+&wlcore {
+	interrupt-parent = <&gpio1>;
+	interrupts = <25 IRQ_TYPE_EDGE_RISING>;
+};
+
+&bt_kim {
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&bt_pins_default>;
+	pinctrl-1 = <&bt_pins_sleep>;
+	nshutdown_gpio = <22>;  /* GPIO1_22 */
+	dev_name = "/dev/ttyS9"; /* UART10 for BT */
 };
 
 &dss {

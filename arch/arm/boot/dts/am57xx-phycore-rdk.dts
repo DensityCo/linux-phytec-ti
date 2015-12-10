@@ -139,3 +139,21 @@
 &rdk_audio {
 	status = "okay";
 };
+
+/* Wifi: enable mmc3, wlcore, and bt_wilink */
+&mmc3 {
+	status = "disabled";
+};
+
+&wlcore {
+	status = "disabled";
+};
+
+&bt_wilink {
+	status = "disabled";
+};
+
+/* Bluetooth: enable wifi nodes and bt_kim */
+&bt_kim {
+	status = "disabled";
+};
