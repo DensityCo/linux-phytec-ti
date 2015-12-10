@@ -43,6 +43,10 @@
 	status = "okay";
 };
 
+&i2c_rtc {
+	status = "okay";
+};
+
 &tps659038_rtc {
 	status = "okay";
 };
