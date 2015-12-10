@@ -20,6 +20,8 @@
 #include <linux/init.h>
 #include <linux/kernel.h>
 #include <linux/module.h>
+#include <linux/of.h>
+#include <linux/of_device.h>
 #include <linux/rtc.h>
 #include <linux/slab.h>
 #include <linux/mutex.h>
@@ -84,6 +86,32 @@ static const struct i2c_device_id m41t80_id[] = {
 	{ }
 };
 MODULE_DEVICE_TABLE(i2c, m41t80_id);
+
+static const kernel_ulong_t m41t80_rtc_features[] = {
+	M41T80_FEATURE_SQ,
+	M41T80_FEATURE_SQ | M41T80_FEATURE_SQ_ALT,
+	M41T80_FEATURE_SQ | M41T80_FEATURE_SQ_ALT | M41T80_FEATURE_WD,
+	M41T80_FEATURE_SQ | M41T80_FEATURE_HT,
+	M41T80_FEATURE_SQ | M41T80_FEATURE_HT | M41T80_FEATURE_BL,
+	M41T80_FEATURE_HT | M41T80_FEATURE_WD,
+};
+
+static const struct of_device_id __maybe_unused m41t80_rtc_of_match[] = {
+	{ .compatible = "m41t62", .data = &m41t80_rtc_features[1], },
+	{ .compatible = "m41t65", .data = &m41t80_rtc_features[5], },
+	{ .compatible = "m41t80", .data = &m41t80_rtc_features[0], },
+	{ .compatible = "m41t81", .data = &m41t80_rtc_features[3], },
+	{ .compatible = "m41t81s", .data = &m41t80_rtc_features[4], },
+	{ .compatible = "m41t82", .data = &m41t80_rtc_features[4], },
+	{ .compatible = "m41t83", .data = &m41t80_rtc_features[4], },
+	{ .compatible = "m41st84", .data = &m41t80_rtc_features[4], },
+	{ .compatible = "m41st85", .data = &m41t80_rtc_features[4], },
+	{ .compatible = "m41st87", .data = &m41t80_rtc_features[4], },
+	{ .compatible = "rv4162", .data = &m41t80_rtc_features[2], },
+	{ }
+};
+MODULE_DEVICE_TABLE(of, m41t80_rtc_of_match);
+
 
 struct m41t80_data {
 	u8 features;
@@ -634,9 +662,12 @@ static int m41t80_probe(struct i2c_client *client,
 			const struct i2c_device_id *id)
 {
 	int rc = 0;
+	char name[32] = "";
+	kernel_ulong_t data = 0;
 	struct rtc_device *rtc = NULL;
 	struct rtc_time tm;
 	struct m41t80_data *clientdata = NULL;
+	const struct of_device_id *of_id = NULL;
 
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C
 				     | I2C_FUNC_SMBUS_BYTE_DATA))
@@ -647,10 +678,19 @@ static int m41t80_probe(struct i2c_client *client,
 	if (!clientdata)
 		return -ENOMEM;
 
-	clientdata->features = id->driver_data;
+	of_id = of_match_device(m41t80_rtc_of_match, &client->dev);
+	if (of_id) {
+		data = (kernel_ulong_t) of_id->data;
+		strcpy(name, of_id->compatible);
+	} else {
+		data = id->driver_data;
+		strcpy(name, client->name);
+	}
+
+	clientdata->features = data;
 	i2c_set_clientdata(client, clientdata);
 
-	rtc = devm_rtc_device_register(&client->dev, client->name,
+	rtc = devm_rtc_device_register(&client->dev, name,
 					&m41t80_rtc_ops, THIS_MODULE);
 	if (IS_ERR(rtc))
 		return PTR_ERR(rtc);
@@ -728,6 +768,7 @@ static int m41t80_remove(struct i2c_client *client)
 static struct i2c_driver m41t80_driver = {
 	.driver = {
 		.name = "rtc-m41t80",
+		.of_match_table = of_match_ptr(m41t80_rtc_of_match),
 	},
 	.probe = m41t80_probe,
 	.remove = m41t80_remove,
