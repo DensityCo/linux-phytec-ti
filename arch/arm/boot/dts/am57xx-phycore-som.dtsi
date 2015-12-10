@@ -14,8 +14,9 @@
 	compatible = "phytec,am57xx-phycore-som", "ti,am5728", "ti,dra742", "ti,dra74", "ti,dra7";
 
 	aliases {
-		rtc0 = &rtc;
+		rtc2 = &rtc;
 		rtc1 = &tps659038_rtc;
+		rtc0 = &i2c_rtc;
 	};
 
 	memory {
@@ -478,6 +479,12 @@
 		compatible = "at,24c32";
 		reg = <0x50>;
 		pagesize = <32>;
+	};
+
+	i2c_rtc: rtc@68 {
+		status = "disabled";
+		compatible = "rv4162";
+		reg = <0x68>;
 	};
 };
 
