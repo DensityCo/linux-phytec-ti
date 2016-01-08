@@ -114,3 +114,4 @@
 &vip1 {
 	status = "okay";
 };
+#include "am57xx-evm-cmem.dtsi"

@@ -313,3 +313,4 @@
 &pcie1 {
 	pcie-reset-gpio = <&gpio2 8 GPIO_ACTIVE_LOW>;
 };
+#include "am57xx-evm-cmem.dtsi"
