@@ -24,6 +24,14 @@
 	};
 };
 
+&dsp1 {
+	status = "disabled";
+};
+
+&dsp2 {
+	status = "disabled";
+};
+
 /**** SOM - pcm057 ****/
 
 &mmc2 {
