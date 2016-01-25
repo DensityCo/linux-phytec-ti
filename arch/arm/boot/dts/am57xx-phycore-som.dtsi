@@ -676,4 +676,20 @@
 &rtc {
 	status = "okay";
 };
+
+&cpu_alert0 {
+	temperature = <75000>;
+};
+
+&cpu_crit {
+	temperature = <90000>;
+};
+
+&core_crit {
+	temperature = <90000>;
+};
+
+&gpu_crit {
+	temperature = <90000>;
+};
 #include "am57xx-evm-cmem.dtsi"
