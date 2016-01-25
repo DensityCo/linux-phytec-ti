@@ -58,6 +58,10 @@
 	status = "okay";
 };
 
+&uart5 {
+	status = "okay";
+};
+
 &dcan1 {
 	status = "okay";
 };
