@@ -159,6 +159,21 @@
 		>;
 	};
 
+	uart5_pins_default: uart5_pins_default {
+		pinctrl-single,pins = <
+			0x1dc (PIN_INPUT_SLEW | MUX_MODE2) /* vout1_d0.uart5_rxd */
+			0x1e0 (PIN_INPUT_SLEW | MUX_MODE2) /* vout1_d1.uart5_txd */
+		>;
+	};
+
+	uart5_pins_sleep: uart5_pins_sleep{
+		pinctrl-single,pins = <
+			0x1dc (PIN_INPUT | MUX_MODE15)
+			0x1e0 (PIN_INPUT | MUX_MODE15)
+		>;
+	};
+
+
 	mmc1_pins_default: mmc1_pins_default {
 		pinctrl-single,pins = <
 			0x36c (PIN_INPUT | MUX_MODE14)	/* mmc1sdcd.gpio6_27 */
@@ -491,6 +506,16 @@
 			       &dra7_pmx_core 0x248>;
 };
 
+&uart5 {
+        status = "disabled";
+        pinctrl-names = "default", "sleep";
+        pinctrl-0 = <&uart5_pins_default>;
+        pinctrl-1 = <&uart5_pins_sleep>;
+
+	interrupts-extended = <&crossbar_mpu GIC_SPI 100 IRQ_TYPE_LEVEL_HIGH
+			       &dra7_pmx_core 0x1dc>;
+};
+
 &mac {
 	slaves = <2>;
 	pinctrl-names = "default", "sleep";
@@ -629,18 +654,10 @@
 
 &cpu_trips {
 	cpu_alert1: cpu_alert1 {
-		temperature = <40000>; /* millicelsius */
+		temperature = <75000>; /* millicelsius */
 		hysteresis = <2000>; /* millicelsius */
 		type = "active";
 	};
-};
-
-&cpu_alert0 {
-	temperature = <75000>;
-};
-
-&cpu_crit {
-	temperature = <85000>;
 };
 
 &cpu_cooling_maps {
