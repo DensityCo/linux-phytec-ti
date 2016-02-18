@@ -448,7 +448,7 @@ dtb-$(CONFIG_SOC_DRA7XX) += \
 	am572x-idk.dtb \
 	am572x-idk-lcd-osd.dtb \
 	am571x-idk.dtb \
-	am571x-idk-lcd-osd.dtb
+	am571x-idk-lcd-osd.dtb \
 	am57xx-phycore-rdk.dtb
 dtb-$(CONFIG_ARCH_ORION5X) += \
 	orion5x-lacie-d2-network.dtb \
