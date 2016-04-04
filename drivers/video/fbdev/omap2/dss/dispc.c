@@ -3335,7 +3335,7 @@ static unsigned long dispc_fclk_rate(void)
 		if (!pll)
 			pll = dss_pll_find("video1");
 
-		r = pll->cinfo.clkout[0];
+		r = pll->cinfo.clkout[2];
 		break;
 	default:
 		BUG();
@@ -3373,7 +3373,7 @@ static unsigned long dispc_mgr_lclk_rate(enum omap_channel channel)
 			if (!pll)
 				pll = dss_pll_find("video1");
 
-			r = pll->cinfo.clkout[0];
+			r = pll->cinfo.clkout[2];
 			break;
 		default:
 			BUG();
