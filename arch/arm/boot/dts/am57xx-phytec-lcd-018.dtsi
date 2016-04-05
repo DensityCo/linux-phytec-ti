@@ -20,34 +20,70 @@
 &dra7_pmx_core {
         lcd_pins: pinmux_lcd {
                 pinctrl-single,pins = <
-			0x158 (PIN_OUTPUT | MUX_MODE4)   /* vin2a_de0.vout2_de */
-			0x15c (PIN_OUTPUT | MUX_MODE4)   /* vin2a_fld0.vout2_clk */
-			0x160 (PIN_OUTPUT | MUX_MODE4)   /* vin2a_hsync0.vout2_hsync */
-			0x164 (PIN_OUTPUT | MUX_MODE4)   /* vin2a_vsync0.vout2_vsync */
-			0x2ac (PIN_OUTPUT | MUX_MODE6)   /* mcasp1_aclkr.vout2_d0 */
-			0x2b0 (PIN_OUTPUT | MUX_MODE6)   /* mcasp1_fsr.vout2_d1 */
-			0x2bc (PIN_OUTPUT | MUX_MODE6)   /* mcasp1_axr2.vout2_d2 */
-			0x2c0 (PIN_OUTPUT | MUX_MODE6)   /* mcasp1_axr3.vout2_d3 */
-			0x2c4 (PIN_OUTPUT | MUX_MODE6)   /* mcasp1_axr4.vout2_d4 */
-			0x2c8 (PIN_OUTPUT | MUX_MODE6)   /* mcasp1_axr5.vout2_d5 */
-			0x2cc (PIN_OUTPUT | MUX_MODE6)   /* mcasp1_axr6.vout2_d6 */
-			0x2d0 (PIN_OUTPUT | MUX_MODE6)   /* mcasp1_axr7.vout2_d7 */
-			0x2fc (PIN_OUTPUT | MUX_MODE6)   /* mcasp2_aclkr.vout2_d8 */
-			0x300 (PIN_OUTPUT | MUX_MODE6)   /* mcasp2_fsr.vout2_d9 */
-			0x304 (PIN_OUTPUT | MUX_MODE6)   /* mcasp2_axr0.vout2_d10 */
-			0x308 (PIN_OUTPUT | MUX_MODE6)   /* mcasp2_axr1.vout2_d11 */
-			0x314 (PIN_OUTPUT | MUX_MODE6)   /* mcasp2_axr4.vout2_d12 */
-			0x318 (PIN_OUTPUT | MUX_MODE6)   /* mcasp2_axr5.vout2_d13 */
-			0x31c (PIN_OUTPUT | MUX_MODE6)   /* mcasp2_axr6.vout2_d14 */
-			0x320 (PIN_OUTPUT | MUX_MODE6)   /* mcasp2_axr7.vout2_d15 */
-			0x334 (PIN_OUTPUT | MUX_MODE6)   /* mcasp4_aclkx.vout2_d16 */
-			0x338 (PIN_OUTPUT | MUX_MODE6)   /* mcasp4_fsx.vout2_d17 */
-			0x33c (PIN_OUTPUT | MUX_MODE6)   /* mcasp4_axr0.vout2_d18 */
-			0x340 (PIN_OUTPUT | MUX_MODE6)   /* mcasp4_axr1.vout2_d19 */
-			0x344 (PIN_OUTPUT | MUX_MODE6)   /* mcasp5_aclkx.vout2_d20 */
-			0x348 (PIN_OUTPUT | MUX_MODE6)   /* mcasp5_fsx.vout2_d21 */
-			0x34c (PIN_OUTPUT | MUX_MODE6)   /* mcasp5_axr0.vout2_d22 */
-			0x350 (PIN_OUTPUT | MUX_MODE6)   /* mcasp5_axr1.vout2_d23 */
+			0x158 (PIN_OUTPUT | MUX_MODE4 | SLEWCONTROL | MANUAL_MODE)   /* vin2a_de0.vout2_de */
+			0x15c (PIN_OUTPUT | MUX_MODE4 | SLEWCONTROL | MANUAL_MODE)   /* vin2a_fld0.vout2_clk */
+			0x160 (PIN_OUTPUT | MUX_MODE4 | SLEWCONTROL | MANUAL_MODE)   /* vin2a_hsync0.vout2_hsync */
+			0x164 (PIN_OUTPUT | MUX_MODE4 | SLEWCONTROL | MANUAL_MODE)   /* vin2a_vsync0.vout2_vsync */
+			0x2ac (PIN_OUTPUT | MUX_MODE6 | SLEWCONTROL | MANUAL_MODE)   /* mcasp1_aclkr.vout2_d0 */
+			0x2b0 (PIN_OUTPUT | MUX_MODE6 | SLEWCONTROL | MANUAL_MODE)   /* mcasp1_fsr.vout2_d1 */
+			0x2bc (PIN_OUTPUT | MUX_MODE6 | SLEWCONTROL | MANUAL_MODE)   /* mcasp1_axr2.vout2_d2 */
+			0x2c0 (PIN_OUTPUT | MUX_MODE6 | SLEWCONTROL | MANUAL_MODE)   /* mcasp1_axr3.vout2_d3 */
+			0x2c4 (PIN_OUTPUT | MUX_MODE6 | SLEWCONTROL | MANUAL_MODE)   /* mcasp1_axr4.vout2_d4 */
+			0x2c8 (PIN_OUTPUT | MUX_MODE6 | SLEWCONTROL | MANUAL_MODE)   /* mcasp1_axr5.vout2_d5 */
+			0x2cc (PIN_OUTPUT | MUX_MODE6 | SLEWCONTROL | MANUAL_MODE)   /* mcasp1_axr6.vout2_d6 */
+			0x2d0 (PIN_OUTPUT | MUX_MODE6 | SLEWCONTROL | MANUAL_MODE)   /* mcasp1_axr7.vout2_d7 */
+			0x2fc (PIN_OUTPUT | MUX_MODE6 | SLEWCONTROL | MANUAL_MODE)   /* mcasp2_aclkr.vout2_d8 */
+			0x300 (PIN_OUTPUT | MUX_MODE6 | SLEWCONTROL | MANUAL_MODE)   /* mcasp2_fsr.vout2_d9 */
+			0x304 (PIN_OUTPUT | MUX_MODE6 | SLEWCONTROL | MANUAL_MODE)   /* mcasp2_axr0.vout2_d10 */
+			0x308 (PIN_OUTPUT | MUX_MODE6 | SLEWCONTROL | MANUAL_MODE)   /* mcasp2_axr1.vout2_d11 */
+			0x314 (PIN_OUTPUT | MUX_MODE6 | SLEWCONTROL | MANUAL_MODE)   /* mcasp2_axr4.vout2_d12 */
+			0x318 (PIN_OUTPUT | MUX_MODE6 | SLEWCONTROL | MANUAL_MODE)   /* mcasp2_axr5.vout2_d13 */
+			0x31c (PIN_OUTPUT | MUX_MODE6 | SLEWCONTROL | MANUAL_MODE)   /* mcasp2_axr6.vout2_d14 */
+			0x320 (PIN_OUTPUT | MUX_MODE6 | SLEWCONTROL | MANUAL_MODE)   /* mcasp2_axr7.vout2_d15 */
+			0x334 (PIN_OUTPUT | MUX_MODE6 | SLEWCONTROL | MANUAL_MODE)   /* mcasp4_aclkx.vout2_d16 */
+			0x338 (PIN_OUTPUT | MUX_MODE6 | SLEWCONTROL | MANUAL_MODE)   /* mcasp4_fsx.vout2_d17 */
+			0x33c (PIN_OUTPUT | MUX_MODE6 | SLEWCONTROL | MANUAL_MODE)   /* mcasp4_axr0.vout2_d18 */
+			0x340 (PIN_OUTPUT | MUX_MODE6 | SLEWCONTROL | MANUAL_MODE)   /* mcasp4_axr1.vout2_d19 */
+			0x344 (PIN_OUTPUT | MUX_MODE6 | SLEWCONTROL | MANUAL_MODE)   /* mcasp5_aclkx.vout2_d20 */
+			0x348 (PIN_OUTPUT | MUX_MODE6 | SLEWCONTROL | MANUAL_MODE)   /* mcasp5_fsx.vout2_d21 */
+			0x34c (PIN_OUTPUT | MUX_MODE6 | SLEWCONTROL | MANUAL_MODE)   /* mcasp5_axr0.vout2_d22 */
+			0x350 (PIN_OUTPUT | MUX_MODE6 | SLEWCONTROL | MANUAL_MODE)   /* mcasp5_axr1.vout2_d23 */
+		>;
+	};
+
+	lcd_pins_iodelay_conf: lcd_pins_iodelay_conf {
+		pinctrl-single,pins = <
+			0xb6c (A_DELAY(2000) | G_DELAY(229))	/* CFG_VIN2A_DE0_OUT */
+			0xb78 (A_DELAY(0) | G_DELAY(697))	/* CFG_VIN2A_FLD0_OUT */
+			0xb84 (A_DELAY(2516) | G_DELAY(0))	/* CFG_VIN2A_HSYNC0_OUT */
+			0xb90 (A_DELAY(1937) | G_DELAY(406))	/* CFG_VIN2A_VSYNC0_OUT */
+			0x3b0 (A_DELAY(3116) | G_DELAY(360))	/* CFG_MCASP1_ACLKR_OUT */
+			0x488 (A_DELAY(1170) | G_DELAY(1000))	/* CFG_MCASP1_FSR_OUT */
+			0x428 (A_DELAY(1321) | G_DELAY(1250))	/* CFG_MCASP1_AXR2_OUT */
+			0x434 (A_DELAY(1275) | G_DELAY(1020))	/* CFG_MCASP1_AXR3_OUT */
+			0x440 (A_DELAY(1392) | G_DELAY(1360))	/* CFG_MCASP1_AXR4_OUT */
+			0x44c (A_DELAY(2364) | G_DELAY(240))	/* CFG_MCASP1_AXR5_OUT */
+			0x458 (A_DELAY(1480) | G_DELAY(1090))	/* CFG_MCASP1_AXR6_OUT */
+			0x464 (A_DELAY(1307) | G_DELAY(1180))	/* CFG_MCASP1_AXR7_OUT */
+
+			0x4a0 (A_DELAY(2983) | G_DELAY(240))	/* CFG_MCASP2_ACLKR_OUT */
+			0x4d8 (A_DELAY(1721) | G_DELAY(120))	/* CFG_MCASP2_AXR0_OUT */
+			0x4c4 (A_DELAY(1067) | G_DELAY(840))	/* CFG_MCASP2_AXR1_OUT */
+			0x4e8 (A_DELAY(1093) | G_DELAY(1040))	/* CFG_MCASP2_AXR4_OUT */
+			0x4f4 (A_DELAY(1810) | G_DELAY(240))	/* CFG_MCASP2_AXR5_OUT */
+			0x500 (A_DELAY(2844) | G_DELAY(240))	/* CFG_MCASP2_AXR6_OUT */
+			0x50c (A_DELAY(1608) | G_DELAY(120))	/* CFG_MCASP2_AXR7_OUT */
+			0x518 (A_DELAY(980) | G_DELAY(536))	/* CFG_MCASP2_FSR_OUT */
+
+			0x560 (A_DELAY(1635) | G_DELAY(1240))	/* CFG_MCASP4_ACLKX_OUT */
+			0x56c (A_DELAY(1569) | G_DELAY(120))	/* CFG_MCASP4_AXR0_OUT */
+			0x578 (A_DELAY(798) | G_DELAY(600))	/* CFG_MCASP4_AXR1_OUT */
+			0x584 (A_DELAY(893) | G_DELAY(540))	/* CFG_MCASP4_FSX_OUT */
+
+			0x590 (A_DELAY(4400) | G_DELAY(1820))	/* CFG_MCASP5_ACLKX_OUT */
+			0x59c (A_DELAY(4640) | G_DELAY(980))	/* CFG_MCASP5_AXR0_OUT */
+			0x5a8 (A_DELAY(4200) | G_DELAY(1120))	/* CFG_MCASP5_AXR1_OUT */
+			0x5b4 (A_DELAY(4330) | G_DELAY(1160))	/* CFG_MCASP5_FSX_OUT */
 		>;
 	};
 };
@@ -63,7 +99,7 @@
 	lcd0: display {
 		compatible = "ETM0700G0DH6", "panel-dpi";
 		pinctrl-names = "default";
-		pinctrl-0 = <&lcd_pins>;
+		pinctrl-0 = <&lcd_pins &lcd_pins_iodelay_conf>;
 		status = "disabled";
 
 		label = "lcd2";

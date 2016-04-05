@@ -588,9 +588,11 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pcie1_pins>;
 
+/* FIXME (RR): pci-dra7xx driver ignores the GPIO_ACTIVE_ flags
+ *             and only cares about pcie-reset-active-low */
 	pcie-reset-active-low;
 	pcie-clk-oe-gpio = <&gpio8 7 GPIO_ACTIVE_HIGH>;
-	pcie-reset-gpio = <&gpio8 4 GPIO_ACTIVE_HIGH>; /* PWRGD (X27-A11) */
+	pcie-reset-gpio = <&gpio8 4 GPIO_ACTIVE_LOW>; /* PWRGD (X27-A11) */
 };
 
 &usb2_phy1 {

@@ -17,10 +17,9 @@
 	};
 
 	aliases {
-/*		display1 = &hdmi0; */
-		display0 = &lcd0; 
+		display0 = &lcd0;
 
-/*		sound1 = &hdmi; */
+/*		sound0 = &hdmi; */
 		sound0 = &rdk_audio;
 	};
 };
