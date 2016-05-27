@@ -169,3 +169,33 @@
 &mcspi1 {
 	status = "okay";
 };
+
+/* Camera Support */
+&i2c3 {
+	status = "okay";
+};
+&vip2 {
+	status = "okay";
+};
+&vin3a {
+	status = "okay";
+};
+&vin3a_ep {
+	status = "okay";
+
+	remote-endpoint = <&mt9m131_ep>;
+};
+/* VM-011 */
+&vm_011 {
+	status = "disabled";
+};
+&mt9p031_ep {
+	status = "disabled";
+};
+/* VM-009 */
+&vm_009 {
+	status = "okay";
+};
+&mt9m131_ep {
+	status = "okay";
+};
