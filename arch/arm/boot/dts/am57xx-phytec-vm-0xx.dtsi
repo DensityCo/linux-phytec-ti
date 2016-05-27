@@ -1,0 +1,61 @@
+/*
+ * Copyright (C) 2016 Russell Robinson <rrobinson@phytec.com>
+ * Copyright (C) PHYTEC America, LLC.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+/*
+ * The board specific DTS file has to:
+ *  - Specify camera reset and enable gpios
+ *  - Mux the  enable pins
+*/
+
+&i2c3 {
+	vm_009: mt9m111@48 {
+		status = "disabled";
+		compatible = "micron,mt9m111";
+		reg = <0x48>;
+
+		port {
+			mt9m131_ep: endpoint {
+				status = "disabled";
+				remote-endpoint = <&vin3a>;
+
+				hsync-active = <1>;
+				vsync-active = <1>;
+				pclk-sample = <0>;
+				bus-width = <8>;
+			};
+		};
+	};
+
+	vm_011: mt9p031@48 {
+		status = "disabled";
+		compatible = "aptina,mt9p031";
+		reg = <0x48>;
+
+		port {
+			mt9p031_ep: endpoint {
+				status = "disabled";
+				remote-endpoint = <&vin3a>;
+
+				hsync-active = <1>;
+				vsync-active = <1>;
+				pclk-sample = <0>;
+				bus-width = <8>;
+			};
+		};
+	};
+};
+
+&vin3a {
+	status = "disabled";
+
+	vin3a_ep: endpoint {
+		status = "disabled";
+		slave-mode;
+	};
+};

@@ -101,6 +101,20 @@
 		#cooling-cells = <2>;
 	};
 
+	cam_ext_mclk: cam_ext_mclk {
+		#clock-cells = <0>;
+		compatible = "fixed-clock";
+		clock-frequency = <26000000>;
+	};
+
+	vcam_fixed: fixedregulator-vcam {
+		compatible = "regulator-fixed";
+		regulator-name = "vcam_fixed";
+		regulator-min-microvolt = <2800000>;
+		regulator-max-microvolt = <2800000>;
+	};
+
+
 };
 
 &dra7_pmx_core {
@@ -379,6 +393,69 @@
 		>;
 	};
 
+        cam_pins_default: cam_pins_default {
+                pinctrl-single,pins = <
+			0x21c (PIN_INPUT_PULLDOWN | MUX_MODE4 | MANUAL_MODE)   /* vout1_d16.vin3a_d0 */
+			0x220 (PIN_INPUT_PULLDOWN | MUX_MODE4 | MANUAL_MODE)   /* vout1_d17.vin3a_d1 */
+			0x224 (PIN_INPUT_PULLDOWN | MUX_MODE4 | MANUAL_MODE)   /* vout1_d18.vin3a_d2 */
+			0x228 (PIN_INPUT_PULLDOWN | MUX_MODE4 | MANUAL_MODE)   /* vout1_d19.vin3a_d3 */
+			0x144 (PIN_INPUT_PULLDOWN | MUX_MODE6 | MANUAL_MODE)   /* vin1a_d20.vin3a_d4 */
+			0x148 (PIN_INPUT_PULLDOWN | MUX_MODE6 | MANUAL_MODE)   /* vin1a_d21.vin3a_d5 */
+			0x14c (PIN_INPUT_PULLDOWN | MUX_MODE6 | MANUAL_MODE)   /* vin1a_d22.vin3a_d6 */
+			0x150 (PIN_INPUT_PULLDOWN | MUX_MODE6 | MANUAL_MODE)   /* vin1a_d23.vin3a_d7 */
+
+			0xe0 (PIN_INPUT | MUX_MODE6 | MANUAL_MODE) /* vin1b_clk1.vin3a_clk0 */
+
+			0x60 (PIN_INPUT_PULLDOWN | MUX_MODE2 | MANUAL_MODE)   /* gpmc_a8.vin3a_hsync0 */
+			0x64 (PIN_INPUT_PULLDOWN | MUX_MODE2 | MANUAL_MODE)   /* gpmc_a9.vin3a_vsync0 */
+			0x68 (PIN_INPUT_PULLDOWN | MUX_MODE2 | MANUAL_MODE)   /* gpmc_a10.vin3a_de0 */
+			0x6c (PIN_INPUT_PULLDOWN | MUX_MODE2 | MANUAL_MODE)   /* gpmc_a11.vin3a_fld0 */
+
+			0xc0 (PIN_OUTPUT | MUX_MODE2)	/* gpmc_clk.clkout1 */
+			0x1e4 (PIN_OUTPUT | MUX_MODE14)   /* vout1_d2.gpio8_2 */
+		>;
+	};
+
+	cam_pins_iodelay_conf: cam_pins_iodelay_conf {
+		pinctrl-single,pins = <
+			0xbf4 (A_DELAY(1996) | G_DELAY(632))	/* CFG_VOUT1_D16_IN */
+			0xc00 (A_DELAY(2190) | G_DELAY(790))	/* CFG_VOUT1_D17_IN */
+			0xc0c (A_DELAY(2100) | G_DELAY(604))	/* CFG_VOUT1_D18_IN */
+			0xc18 (A_DELAY(2108) | G_DELAY(286))	/* CFG_VOUT1_D19_IN */
+
+			0x96c (A_DELAY(1854) | G_DELAY(1624))	/* CFG_VIN1A_D20_IN */
+			0x978 (A_DELAY(1906) | G_DELAY(1520))	/* CFG_VIN1A_D21_IN */
+			0x984 (A_DELAY(1807) | G_DELAY(1437))	/* CFG_VIN1A_D22_IN */
+			0x990 (A_DELAY(1996) | G_DELAY(997))	/* CFG_VIN1A_D23_IN */
+
+			0xa2c (A_DELAY(0) | G_DELAY(0))	/* CFG_VIN1B_CLK1_IN */
+
+			0x24c (A_DELAY(2154) | G_DELAY(978))	/* CFG_GPMC_A8_IN */
+			0x258 (A_DELAY(2185) | G_DELAY(1152))	/* CFG_GPMC_A9_IN */
+			0x120 (A_DELAY(2108) | G_DELAY(823))	/* CFG_GPMC_A10_IN */
+			0x12c (A_DELAY(2068) | G_DELAY(977))	/* CFG_GPMC_A11_IN */
+		>;
+	};
+
+	cam_gpio_pins_default: cam_gpio_pins_default {
+		pinctrl-single,pins = <
+			0x1e4 (PIN_OUTPUT_PULLDOWN | MUX_MODE14) /* vout1_d2.gpio8_2 */
+		>;
+	};
+
+	i2c3_pins_default: pinmux_i2c3_default {
+		pinctrl-single,pins = <
+			0x374 (PIN_INPUT_PULLUP | MUX_MODE2) /* gpio6_10.i2c3_sda */
+			0x378 (PIN_INPUT_PULLUP | MUX_MODE2) /* gpio6_11.i2c3_scl */
+		>;
+	};
+
+	i2c3_pins_sleep: pinmux_i2c3_sleep {
+		pinctrl-single,pins = <
+			0x374 (PIN_INPUT | MUX_MODE15)
+			0x378 (PIN_INPUT | MUX_MODE15)
+		>;
+	};
 };
 
 &phytec_leds {
@@ -411,6 +488,14 @@
 		ti,enable-vbus-detection;
 		ti,enable-id-detection;
 	};
+};
+
+&i2c3 {
+	status = "disabled";
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&i2c3_pins_default>;
+	pinctrl-1 = <&i2c3_pins_sleep>;
+	clock-frequency = <400000>;
 };
 
 &i2c4 {
@@ -681,4 +766,51 @@
 		trip = <&cpu_alert1>;
 		cooling-device = <&gpio_fan THERMAL_NO_LIMIT THERMAL_NO_LIMIT>;
 	};
+};
+
+
+#include "am57xx-phytec-vm-0xx.dtsi"
+
+&vin3a_ep {
+	remote-endpoint = <&mt9p031_ep>;
+};
+
+&vm_009 {
+	pinctrl-names = "default";
+	pinctrl-0 = <
+		&cam_gpio_pins_default
+		&cam_pins_default
+		&cam_pins_iodelay_conf
+	>;
+	reset-gpios = <&gpio8 2 1>;
+
+	clocks = <&cam_ext_mclk 0>;
+	clock-names = "mclk";
+
+	phytec,fixed-clock;
+	phytec,allow-burst;
+};
+
+
+&vm_011 {
+	pinctrl-names = "default";
+	pinctrl-0 = <
+		&cam_gpio_pins_default
+		&cam_pins_default
+		&cam_pins_iodelay_conf
+	>;
+	reset-gpios = <&gpio8 2 1>;
+
+	vdd-supply = <&vcam_fixed>;
+	vdd_io-supply = <&vcam_fixed>;
+	vaa-supply = <&vcam_fixed>;
+
+	clocks = <&cam_ext_mclk 0>;
+	clock-names = "mclk";
+};
+
+&mt9p031_ep {
+	bus-width = <8>;
+	input-clock-frequency = <26000000>;
+	pixel-clock-frequency = <78000000>;
 };
