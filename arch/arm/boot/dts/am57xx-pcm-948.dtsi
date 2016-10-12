@@ -596,6 +596,10 @@
 	pcie-reset-gpio = <&gpio8 4 GPIO_ACTIVE_LOW>; /* PWRGD (X27-A11) */
 };
 
+&sata {
+	ports-implemented = <1>;
+};
+
 &usb2_phy1 {
        phy-supply = <&ldousb_reg>;
 };
