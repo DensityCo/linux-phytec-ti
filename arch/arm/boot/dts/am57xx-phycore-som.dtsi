@@ -58,24 +58,6 @@
 		};
 	};
 
-	ocp {
-		mcasp1: mcasp@48460000 {
-			compatible = "ti,dra7-mcasp1-audio";
-			ti,hwmods = "mcasp1";
-			reg = <0x48460000 0x2000>,
-			      <0x45800000 0x400000>;
-			reg-names = "mpu", "dat";
-			interrupts = <GIC_SPI 104 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 103 IRQ_TYPE_LEVEL_HIGH>;
-			interrupt-names = "tx", "rx";
-			dmas = <&edma_xbar 129>, <&edma_xbar 128>;
-			dma-names = "tx", "rx";
-			clocks = <&mcasp1_ahclkr_mux>, <&mcasp1_ahclkx_mux>;
-			clock-names = "ahclkr", "fck";
-			status = "disabled";
-		};
-	};
-
 	vdd_3v3: fixedregulator-vdd_3v3 {
 		compatible = "regulator-fixed";
 		regulator-name = "vdd_3v3";
@@ -511,6 +493,13 @@
 
 &oppdm_core {
 	vdd-supply = <&smps6_reg>;
+};
+
+&mcasp1 {
+	compatible = "ti,dra7-mcasp1-audio";
+	reg = <0x48460000 0x2000>,
+	      <0x45800000 0x400000>;
+	reg-names = "mpu", "dat";
 };
 
 &mac {
