@@ -81,9 +81,6 @@
 /* FIXME: RR - HDMI, DSS, and LCD are disabled until
  *             the omapdrm-pvr build issues are resolved
  */
-&dss {
-	status = "okay";
-};
 
 /* LCD-018 display: enable lcd0, backlight, and ft5406 */
 &lcd0 {
@@ -104,6 +101,10 @@
 	status = "okay";
 };
 &hdmi0 {
+	status = "okay";
+};
+
+&dss {
 	status = "okay";
 };
 
