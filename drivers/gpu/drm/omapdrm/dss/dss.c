@@ -804,7 +804,9 @@ static int dss_dpi_select_source_dra7xx(int port, enum omap_channel channel)
 {
 	switch (port) {
 	case 0:
-		return dss_dpi_select_source_omap5(port, channel);
+		if (channel != OMAP_DSS_CHANNEL_LCD)
+			return -EINVAL;
+		break;
 	case 1:
 		if (channel != OMAP_DSS_CHANNEL_LCD2)
 			return -EINVAL;
@@ -817,7 +819,7 @@ static int dss_dpi_select_source_dra7xx(int port, enum omap_channel channel)
 		return -EINVAL;
 	}
 
-	return 0;
+	return dss_dpi_select_source_omap5(port, channel);
 }
 
 int dss_dpi_select_source(int port, enum omap_channel channel)
