@@ -277,8 +277,10 @@ static int tpd_probe(struct platform_device *pdev)
 
 	gpio = devm_gpiod_get_index(&pdev->dev, NULL, 0,
 		GPIOD_IN);
-	if (IS_ERR(gpio))
+	if (IS_ERR(gpio)) {
+		r = PTR_ERR(gpio);
 		goto err_gpio;
+	}
 
 	ddata->hpd_gpio = gpio;
 
