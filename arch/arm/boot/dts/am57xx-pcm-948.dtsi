@@ -289,7 +289,6 @@
 
 	usb2_pins_default: pinmux_usb2_pins_default {
 		pinctrl-single,pins = <
-			0x1d0 (PIN_INPUT | MUX_MODE14)	   /* vout1_fld.gpio4_21 */
 			0x284 (PIN_INPUT_SLEW | MUX_MODE0) /* usb2_drvvbus */
 			0x230 (PIN_INPUT | MUX_MODE14)     /* vout1_d21.gpio8_21 */
 		>;
@@ -297,7 +296,6 @@
 
 	usb2_pins_sleep: pinmux_usb2_pins_sleep {
 		pinctrl-single,pins = <
-			0x1d0 (PIN_INPUT | MUX_MODE14)	   /* vout1_fld.gpio4_21 */
 			0x284 (PIN_INPUT_SLEW | MUX_MODE15) /* usb2_drvvbus */
 			0x230 (PIN_INPUT | MUX_MODE14)     /* vout1_d21.gpio8_21 */
 		>;
@@ -305,7 +303,8 @@
 
 	extcon_pins_default:  extcon_pins_default {
 		pinctrl-single,pins = <
-			0x1f4 (PIN_INPUT | MUX_MODE14) /* vout1_d6.gpio8_6 */
+			0x1d0 (PIN_INPUT_PULLDOWN | MUX_MODE14)	/* vout1_fld.gpio4_21 */
+			0x1f4 (PIN_INPUT | MUX_MODE14)		/* vout1_d6.gpio8_6 */
 		>;
 	};
 
@@ -406,7 +405,8 @@
 		compatible = "ti,palmas-usb-vid";
 		pinctrl-names = "default";
 		pinctrl-0 = <&extcon_pins_default>;
-		id-gpios = <&gpio8 6 GPIO_ACTIVE_HIGH>;
+		id-gpio = <&gpio8 6 GPIO_ACTIVE_HIGH>;
+		vbus-gpio = <&gpio4 21 GPIO_ACTIVE_HIGH>;
 
 		ti,enable-vbus-detection;
 		ti,enable-id-detection;
