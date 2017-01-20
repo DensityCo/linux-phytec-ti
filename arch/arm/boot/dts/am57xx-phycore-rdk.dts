@@ -165,3 +165,7 @@
 &bt_kim {
 	status = "disabled";
 };
+
+&mcspi1 {
+	status = "okay";
+};
