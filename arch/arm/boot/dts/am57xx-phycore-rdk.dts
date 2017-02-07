@@ -66,6 +66,10 @@
 	status = "okay";
 };
 
+&gpio_fan {
+	status = "okay";
+};
+
 /* LCD-018 display: enable lcd0, backlight, and ft5406 */
 &lcd0 {
 	status = "okay";
