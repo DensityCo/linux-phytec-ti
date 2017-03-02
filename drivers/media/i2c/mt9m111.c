@@ -127,6 +127,7 @@
 #define MT9M111_OUTFMT_SWAP_YCbCr_C_Y_RGB_EVEN	(1 << 1)
 #define MT9M111_OUTFMT_SWAP_YCbCr_Cb_Cr_RGB_R_B	(1 << 0)
 
+#define V4L2_CID_X_PIXEL_RATE	(V4L2_CID_USER_BASE | 0x1002)
 /*
  * Camera control register addresses (0x200..0x2ff not implemented)
  */
@@ -772,6 +773,13 @@ static int mt9m111_s_ctrl(struct v4l2_ctrl *ctrl)
 		return mt9m111_set_autoexposure(mt9m111, ctrl->val);
 	case V4L2_CID_AUTO_WHITE_BALANCE:
 		return mt9m111_set_autowhitebalance(mt9m111, ctrl->val);
+	case V4L2_CID_X_PIXEL_RATE:
+		if (mt9m111->clk) {
+			v4l2_clk_set_rate(mt9m111->clk, ctrl->val);
+			ctrl->val = v4l2_clk_get_rate(mt9m111->clk);
+		}
+
+		return 0;
 	}
 
 	return -EINVAL;
@@ -1110,12 +1118,25 @@ done:
 	return ret;
 }
 
+static struct v4l2_ctrl_config const mt9m111_ctrls[] = {
+	{
+		.ops	= &mt9m111_ctrl_ops,
+		.id	= V4L2_CID_X_PIXEL_RATE,
+		.type	= V4L2_CTRL_TYPE_INTEGER,
+		.name	= "X Pixel Rate",
+		.min	=  2000000,
+		.max	= 54000000,
+		.def	= 27000000,
+		.step	= 1,
+	},
+};
+
 static int mt9m111_probe(struct i2c_client *client,
 			 const struct i2c_device_id *did)
 {
 	struct mt9m111 *mt9m111;
 	struct i2c_adapter *adapter = to_i2c_adapter(client->dev.parent);
-	int ret;
+	int ret, i;
 	u32 fixed_rate;
 
 	if (!i2c_check_functionality(adapter, I2C_FUNC_SMBUS_WORD_DATA)) {
@@ -1157,7 +1178,7 @@ static int mt9m111_probe(struct i2c_client *client,
 						    "mt9m111,allow-burst");
 
 	v4l2_i2c_subdev_init(&mt9m111->subdev, client, &mt9m111_subdev_ops);
-	v4l2_ctrl_handler_init(&mt9m111->hdl, 5);
+	v4l2_ctrl_handler_init(&mt9m111->hdl, ARRAY_SIZE(mt9m111_ctrls) + 5);
 	v4l2_ctrl_new_std(&mt9m111->hdl, &mt9m111_ctrl_ops,
 			V4L2_CID_VFLIP, 0, 1, 1, 0);
 	v4l2_ctrl_new_std(&mt9m111->hdl, &mt9m111_ctrl_ops,
@@ -1169,6 +1190,10 @@ static int mt9m111_probe(struct i2c_client *client,
 	v4l2_ctrl_new_std_menu(&mt9m111->hdl,
 			&mt9m111_ctrl_ops, V4L2_CID_EXPOSURE_AUTO, 1, 0,
 			V4L2_EXPOSURE_AUTO);
+
+	for (i = 0; i < ARRAY_SIZE(mt9m111_ctrls); ++i)
+		v4l2_ctrl_new_custom(&mt9m111->hdl, &mt9m111_ctrls[i], NULL);
+
 	mt9m111->subdev.ctrl_handler = &mt9m111->hdl;
 	if (mt9m111->hdl.error) {
 		ret = mt9m111->hdl.error;
