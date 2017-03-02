@@ -974,6 +974,25 @@ static int mt9m111_enum_mbus_code(struct v4l2_subdev *sd,
 	return 0;
 }
 
+static int mt9m111_pad_enum_frame_size(struct v4l2_subdev *sd,
+				       struct v4l2_subdev_pad_config *cfg,
+				       struct v4l2_subdev_frame_size_enum *fse)
+{
+	struct mt9m111 *mt9m111 = container_of(sd, struct mt9m111, subdev);
+	struct mt9m111_datafmt const *fmt =
+		mt9m111_fmt_by_idx(mt9m111, fse->index);
+
+	if (fse->pad != 0 || !fmt)
+		return -EINVAL;
+
+	fse->min_width = 2;
+	fse->max_width = 1280;
+	fse->min_height = 2;
+	fse->max_height = 1024;
+
+	return 0;
+}
+
 static int mt9m111_g_mbus_config(struct v4l2_subdev *sd,
 				struct v4l2_mbus_config *cfg)
 {
@@ -1037,6 +1056,7 @@ static struct v4l2_subdev_video_ops mt9m111_subdev_video_ops = {
 
 static const struct v4l2_subdev_pad_ops mt9m111_subdev_pad_ops = {
 	.enum_mbus_code = mt9m111_enum_mbus_code,
+	.enum_frame_size= mt9m111_pad_enum_frame_size,
 	.get_selection	= mt9m111_get_selection,
 	.set_selection	= mt9m111_set_selection,
 	.get_fmt	= mt9m111_get_fmt,
