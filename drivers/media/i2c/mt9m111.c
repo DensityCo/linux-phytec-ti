@@ -218,6 +218,8 @@ struct mt9m111 {
 	const struct mt9m111_datafmt *fmt;
 	int lastpage;	/* PageMap cache value */
 
+	bool	invert_pixclk:1;
+
 	bool	is_streaming:1;
 };
 
@@ -487,7 +489,9 @@ static int mt9m111_set_pixfmt(struct mt9m111 *mt9m111,
 		MT9M111_OUTFMT_RGB565 | MT9M111_OUTFMT_RGB555 |
 		MT9M111_OUTFMT_RGB444x | MT9M111_OUTFMT_RGBx444 |
 		MT9M111_OUTFMT_SWAP_YCbCr_C_Y_RGB_EVEN |
-		MT9M111_OUTFMT_SWAP_YCbCr_Cb_Cr_RGB_R_B;
+		MT9M111_OUTFMT_SWAP_YCbCr_Cb_Cr_RGB_R_B |
+		MT9M111_OUTFMT_INV_PIX_CLOCK;
+
 	int ret;
 
 	switch (code) {
@@ -538,6 +542,9 @@ static int mt9m111_set_pixfmt(struct mt9m111 *mt9m111,
 		dev_err(&client->dev, "Pixel format not handled: %x\n", code);
 		return -EINVAL;
 	}
+
+	if (mt9m111->invert_pixclk)
+		data_outfmt2 |= MT9M111_OUTFMT_INV_PIX_CLOCK;
 
 	ret = mt9m111_reg_mask(client, context_a.output_fmt_ctrl2,
 			       data_outfmt2, mask_outfmt2);
@@ -893,9 +900,14 @@ static int mt9m111_enum_mbus_code(struct v4l2_subdev *sd,
 static int mt9m111_g_mbus_config(struct v4l2_subdev *sd,
 				struct v4l2_mbus_config *cfg)
 {
-	cfg->flags = V4L2_MBUS_MASTER | V4L2_MBUS_PCLK_SAMPLE_RISING |
+	struct mt9m111 *mt9m111 = container_of(sd, struct mt9m111, subdev);
+
+	cfg->flags = V4L2_MBUS_MASTER |
 		V4L2_MBUS_HSYNC_ACTIVE_HIGH | V4L2_MBUS_VSYNC_ACTIVE_HIGH |
 		V4L2_MBUS_DATA_ACTIVE_HIGH;
+	cfg->flags |= (mt9m111->invert_pixclk ?
+		       V4L2_MBUS_PCLK_SAMPLE_RISING :
+		       V4L2_MBUS_PCLK_SAMPLE_FALLING);
 	cfg->type = V4L2_MBUS_PARALLEL;
 
 	return 0;
@@ -1039,6 +1051,9 @@ static int mt9m111_probe(struct i2c_client *client,
 
 	/* Default HIGHPOWER context */
 	mt9m111->ctx = &context_b;
+
+	mt9m111->invert_pixclk = of_property_read_bool(client->dev.of_node,
+						      "mt9m111,invert-pixclk");
 
 	v4l2_i2c_subdev_init(&mt9m111->subdev, client, &mt9m111_subdev_ops);
 	v4l2_ctrl_handler_init(&mt9m111->hdl, 5);
