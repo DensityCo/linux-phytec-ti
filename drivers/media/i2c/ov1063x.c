@@ -815,46 +815,6 @@ static int ov1063x_s_parm(struct v4l2_subdev *sd, struct v4l2_streamparm *parms)
 	return 0;
 }
 
-static int ov1063x_s_crop(struct v4l2_subdev *sd, const struct v4l2_crop *a)
-{
-	struct v4l2_crop a_writable = *a;
-	struct v4l2_rect *rect = &a_writable.c;
-	struct i2c_client *client = v4l2_get_subdevdata(sd);
-	struct ov1063x_priv *priv = to_ov1063x(client);
-	int ret = -EINVAL;
-
-	ret = ov1063x_set_params(client, rect->width, rect->height);
-	if (!ret)
-		return -EINVAL;
-
-	rect->width = priv->width;
-	rect->height = priv->height;
-	rect->left = 0;
-	rect->top = 0;
-
-	return ret;
-}
-
-static int ov1063x_g_crop(struct v4l2_subdev *sd, struct v4l2_crop *a)
-{
-	struct i2c_client *client = v4l2_get_subdevdata(sd);
-	struct ov1063x_priv *priv = to_ov1063x(client);
-
-	if (priv) {
-		a->c.width = priv->width;
-		a->c.height = priv->height;
-	} else {
-		a->c.width = OV1063X_MAX_WIDTH;
-		a->c.height = OV1063X_MAX_HEIGHT;
-	}
-
-	a->c.left = 0;
-	a->c.top = 0;
-	a->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-
-	return 0;
-}
-
 static int ov1063x_cropcap(struct v4l2_subdev *sd, struct v4l2_cropcap *a)
 {
 	a->bounds.left = 0;
@@ -949,8 +909,6 @@ static const struct v4l2_ctrl_ops ov1063x_ctrl_ops = {
 static struct v4l2_subdev_video_ops ov1063x_subdev_video_ops = {
 	.s_stream	= ov1063x_s_stream,
 	.cropcap	= ov1063x_cropcap,
-	.g_crop		= ov1063x_g_crop,
-	.s_crop		= ov1063x_s_crop,
 	.g_parm		= ov1063x_g_parm,
 	.s_parm		= ov1063x_s_parm,
 };

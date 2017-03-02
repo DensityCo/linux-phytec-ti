@@ -1828,37 +1828,6 @@ static int mt9t11x_cropcap(struct v4l2_subdev *sd, struct v4l2_cropcap *a)
 	return 0;
 }
 
-static int mt9t11x_g_crop(struct v4l2_subdev *sd, struct v4l2_crop *a)
-{
-	struct mt9t11x_priv *priv = sd_to_mt9t11x(sd);
-	struct i2c_client *client = priv->client;
-
-	dev_dbg(&client->dev, "%s:\n", __func__);
-
-	mutex_lock(&priv->lock);
-	a->c	= priv->frame;
-	a->type	= V4L2_BUF_TYPE_VIDEO_CAPTURE;
-	mutex_unlock(&priv->lock);
-
-	return 0;
-}
-
-static int mt9t11x_s_crop(struct v4l2_subdev *sd, const struct v4l2_crop *a)
-{
-	struct mt9t11x_priv *priv = sd_to_mt9t11x(sd);
-	struct i2c_client *client = priv->client;
-	const struct v4l2_rect *rect = &a->c;
-	int ret;
-
-	dev_dbg(&client->dev, "%s:\n", __func__);
-
-	mutex_lock(&priv->lock);
-	ret = mt9t11x_set_params(priv, rect, priv->format->code);
-	mutex_unlock(&priv->lock);
-
-	return ret;
-}
-
 static void mt9t11x_get_default_format(struct mt9t11x_priv *priv,
 				       struct v4l2_mbus_framefmt *mf)
 {
@@ -2013,8 +1982,6 @@ static int mt9t11x_enum_frame_sizes(struct v4l2_subdev *sd,
 static struct v4l2_subdev_video_ops mt9t11x_subdev_video_ops = {
 	.s_stream	= mt9t11x_s_stream,
 	.cropcap	= mt9t11x_cropcap,
-	.g_crop		= mt9t11x_g_crop,
-	.s_crop		= mt9t11x_s_crop,
 };
 
 static const struct v4l2_subdev_pad_ops mt9t11x_subdev_pad_ops = {
