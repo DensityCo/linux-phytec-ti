@@ -216,6 +216,8 @@ struct mt9m111 {
 	int power_count;
 	const struct mt9m111_datafmt *fmt;
 	int lastpage;	/* PageMap cache value */
+
+	bool	is_streaming:1;
 };
 
 /* Find a data format by a pixel code */
@@ -785,12 +787,6 @@ static int mt9m111_power_on(struct mt9m111 *mt9m111)
 	struct i2c_client *client = v4l2_get_subdevdata(&mt9m111->subdev);
 	int ret;
 
-	/* Ensure RESET_BAR is active */
-	if (mt9m111->reset) {
-		gpiod_set_value(mt9m111->reset, 1);
-		usleep_range(1000, 2000);
-	}
-
 	ret = v4l2_clk_enable(mt9m111->clk);
 	if (ret < 0)
 		return ret;
@@ -885,8 +881,49 @@ static int mt9m111_g_mbus_config(struct v4l2_subdev *sd,
 	return 0;
 }
 
+static int mt9m111_s_stream_on(struct mt9m111 *mt9m111)
+{
+	int ret;
+
+	ret = mt9m111_s_power(&mt9m111->subdev, 1);
+	if (ret < 0)
+		return -EINVAL;
+	mt9m111->is_streaming = true;
+
+	return 0;
+}
+
+static int mt9m111_s_stream_off(struct mt9m111 *mt9m111)
+{
+	int ret;
+
+	ret = mt9m111_s_power(&mt9m111->subdev, 0);
+	if (ret < 0)
+		return -EINVAL;
+	mt9m111->is_streaming = false;
+
+	return 0;
+}
+
+static int mt9m111_s_stream(struct v4l2_subdev *sd, int enable)
+{
+	struct mt9m111 *mt9m111 = container_of(sd, struct mt9m111, subdev);
+
+	/* TODO: is 'is_streaming' protected by locks in the upper layers? */
+
+	if (enable && mt9m111->is_streaming)
+		return -EBUSY;
+	else if (!enable && !mt9m111->is_streaming)
+		return -EINVAL;
+	else if (enable)
+		return mt9m111_s_stream_on(mt9m111);
+	else
+		return mt9m111_s_stream_off(mt9m111);
+}
+
 static struct v4l2_subdev_video_ops mt9m111_subdev_video_ops = {
 	.g_mbus_config	= mt9m111_g_mbus_config,
+	.s_stream = mt9m111_s_stream,
 };
 
 static const struct v4l2_subdev_pad_ops mt9m111_subdev_pad_ops = {
@@ -913,7 +950,6 @@ static int mt9m111_video_probe(struct i2c_client *client)
 	s32 data;
 	int ret;
 
-	ret = mt9m111_s_power(&mt9m111->subdev, 1);
 	if (ret < 0)
 		return ret;
 
@@ -942,7 +978,6 @@ static int mt9m111_video_probe(struct i2c_client *client)
 	ret = v4l2_ctrl_handler_setup(&mt9m111->hdl);
 
 done:
-	mt9m111_s_power(&mt9m111->subdev, 0);
 	return ret;
 }
 
@@ -1013,6 +1048,8 @@ static int mt9m111_probe(struct i2c_client *client,
 	mt9m111->lastpage	= -1;
 	mutex_init(&mt9m111->power_lock);
 
+	ret = mt9m111_s_power(&mt9m111->subdev, 1);
+
 	ret = mt9m111_video_probe(client);
 	if (ret < 0)
 		goto out_hdlfree;
@@ -1025,6 +1062,7 @@ static int mt9m111_probe(struct i2c_client *client,
 	return 0;
 
 out_hdlfree:
+	ret = mt9m111_s_power(&mt9m111->subdev, 0);
 	v4l2_ctrl_handler_free(&mt9m111->hdl);
 out_clkput:
 	v4l2_clk_put(mt9m111->clk);
@@ -1035,12 +1073,13 @@ out_clkput:
 static int mt9m111_remove(struct i2c_client *client)
 {
 	struct mt9m111 *mt9m111 = to_mt9m111(client);
+	int ret = mt9m111_s_power(&mt9m111->subdev, 0);
 
 	v4l2_async_unregister_subdev(&mt9m111->subdev);
 	v4l2_clk_put(mt9m111->clk);
 	v4l2_ctrl_handler_free(&mt9m111->hdl);
 
-	return 0;
+	return ret;
 }
 static const struct of_device_id mt9m111_of_match[] = {
 	{ .compatible = "micron,mt9m111", },
