@@ -562,6 +562,30 @@
 	ti,pindir-d0-out-d1-in;
 };
 
+/* NOTE: support added for pcie2 in endpoint mode
+ *       additionally, setting axi1 { status = "okay" };
+ *       is necessary for any pcie2 use.
+ *
+ *       pcie2_rc/ep are incompatible with PCM-948
+ */
+&axi1 {
+	pcie2_ep: pcie_ep@51800000 {
+		compatible = "ti,dra7-pcie-ep";
+		reg = <0x51800000 0x28>, <0x51802000 0x14c>,
+		      <0x51801000 0x28>, <0x1000 0x10000000>;
+		reg-names = "ep_dbics", "ti_conf", "ep_dbics2", "addr_space";
+		interrupts = <0 355 0x4>;
+		num-lanes = <1>;
+		num-ib-windows = <4>;
+		num-ob-windows = <16>;
+		ti,hwmods = "pcie2";
+		phys = <&pcie2_phy>;
+		phy-names = "pcie-phy1";
+		syscon-legacy-mode = <&scm_conf1 0x14 1>;
+		status = "disabled";
+	};
+};
+
 &mailbox3 {
 	status = "okay";
 	mbox_pru1_0: mbox_pru1_0 {
@@ -684,4 +708,5 @@
 &rtc {
 	status = "okay";
 };
+
 #include "am57xx-evm-cmem.dtsi"
