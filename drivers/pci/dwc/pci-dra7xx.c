@@ -592,6 +592,7 @@ static int dra7xx_pcie_ep_legacy_mode(struct device *dev)
 static int __init dra7xx_pcie_probe(struct platform_device *pdev)
 {
 	u32 reg;
+	u32 field;
 	int ret;
 	int irq;
 	int i;
@@ -604,6 +605,7 @@ static int __init dra7xx_pcie_probe(struct platform_device *pdev)
 	struct dra7xx_pcie *dra7xx;
 	struct device *dev = &pdev->dev;
 	struct device_node *np = dev->of_node;
+	struct regmap *regmap;
 	char name[10];
 	struct gpio_desc *reset, *clk_oe;
 	const struct of_device_id *match;
@@ -652,6 +654,35 @@ static int __init dra7xx_pcie_probe(struct platform_device *pdev)
 	link = devm_kzalloc(dev, sizeof(*link) * phy_count, GFP_KERNEL);
 	if (!link)
 		return -ENOMEM;
+
+	if (phy_count > 1) {
+		regmap = syscon_regmap_lookup_by_phandle(np,
+							 "syscon-dual-lane");
+		if (IS_ERR(regmap)) {
+			dev_dbg(dev, "can't get syscon-dual-lane\n");
+			return -EINVAL;
+		}
+
+		if (of_property_read_u32_index(np, "syscon-dual-lane", 1,
+					       &reg)) {
+			dev_err(dev,
+				"couldn't get x2 lane mode register offset\n");
+			return -EINVAL;
+		}
+
+		if (of_property_read_u32_index(np, "syscon-dual-lane", 2,
+					       &field)) {
+			dev_err(dev,
+				"can't get bit field for setting x2 lane mode\n");
+			return -EINVAL;
+		}
+
+		ret = regmap_update_bits(regmap, reg, field, field);
+		if (ret) {
+			dev_err(dev, "failed to set x2 lane mode\n");
+			return ret;
+		}
+	}
 
 	for (i = 0; i < phy_count; i++) {
 		snprintf(name, sizeof(name), "pcie-phy%d", i);
