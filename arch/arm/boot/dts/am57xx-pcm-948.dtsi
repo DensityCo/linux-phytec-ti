@@ -679,6 +679,11 @@
 	pcie-reset-active-low;
 	pcie-clk-oe-gpio = <&gpio8 7 GPIO_ACTIVE_HIGH>;
 	pcie-reset-gpio = <&gpio8 4 GPIO_ACTIVE_LOW>; /* PWRGD (X27-A11) */
+
+	num-lanes = <2>;
+	phys = <&pcie1_phy>, <&pcie2_phy>;
+	phy-names = "pcie-phy0", "pcie-phy1";
+	syscon-dual-lane = <&scm_conf_pcie 0x18 0x5>;
 };
 
 &sata {
