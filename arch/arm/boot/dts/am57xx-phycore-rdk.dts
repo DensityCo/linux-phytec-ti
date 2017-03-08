@@ -114,9 +114,14 @@
 	status = "okay";
 };
 
+/* PCIE1: enable pcie2_phy and pcie1_rc for PCIe x2 support */
+&pcie2_phy {
+	status = "okay";
+};
 &pcie1_rc {
 	status = "okay";
 };
+
 &sata {
 	status = "okay";
 };
