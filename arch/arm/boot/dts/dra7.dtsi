@@ -344,7 +344,7 @@
 			};
 		};
 
-		axi@1 {
+		axi1: axi@1 {
 			compatible = "simple-bus";
 			#size-cells = <1>;
 			#address-cells = <1>;
