@@ -204,3 +204,11 @@
 &mt9m131_ep {
 	status = "okay";
 };
+
+/* QSPI1: enable qspi and qspi_nor for N25Q128A13 SPI NOR */
+&qspi {
+	status = "okay";
+};
+&qspi_nor {
+	status = "okay";
+};
