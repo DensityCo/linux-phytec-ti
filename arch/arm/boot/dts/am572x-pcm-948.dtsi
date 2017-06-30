@@ -1,13 +1,14 @@
 /*
- * Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/
+ * Copyright (C) 2015 PHYTEC America, LLC - www.phytec.com
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
  * published by the Free Software Foundation.
  */
+
 / {
-	model = "PHYTEC AM57xx PCM-948";
-	compatible = "phytec,am57xx-pcm-948", "phytec,am57xx-phycore-som", "ti,am5728", "ti,dra742", "ti,dra74", "ti,dra7";
+	model = "PHYTEC phyCORE-AM572x Carrier Board";
+	compatible = "phytec,am572x-pcm-948", "phytec,am572x-phycore-som", "ti,am5728", "ti,dra742", "ti,dra74", "ti,dra7";
 
 	aliases {
 		display0 = &lcd2;
@@ -666,21 +667,21 @@
 };
 
 &phytec_leds {
-		pinctrl-0 = <&leds_som_pins_default &leds_cb_pins_default>;
+	pinctrl-0 = <&leds_som_pins_default &leds_cb_pins_default>;
 
-		led@2 {
-			label = "am57xx-pcm-948:usr1";
-			gpios = <&gpio1 28 GPIO_ACTIVE_HIGH>;
-			linux,default-trigger = "gpio";
-			default-state = "off";
-		};
+	led@2 {
+		label = "am572x-pcm-948:usr1";
+		gpios = <&gpio1 28 GPIO_ACTIVE_HIGH>;
+		linux,default-trigger = "gpio";
+		default-state = "off";
+	};
 
-		led@3 {
-			label = "am57xx-pcm-948:usr2";
-			gpios = <&gpio1 29 GPIO_ACTIVE_HIGH>;
-			linux,default-trigger = "gpio";
-			default-state = "off";
-		};
+	led@3 {
+		label = "am572x-pcm-948:usr2";
+		gpios = <&gpio1 29 GPIO_ACTIVE_HIGH>;
+		linux,default-trigger = "gpio";
+		default-state = "off";
+	};
 };
 
 &tps659038 {

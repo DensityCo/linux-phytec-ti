@@ -1,18 +1,19 @@
 /*
- * Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/
+ * Copyright (C) 2015 PHYTEC America, LLC. - www.phytec.com
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
  * published by the Free Software Foundation.
  */
+
 #include "dra74x.dtsi"
 #include "am57xx-industrial-grade.dtsi"
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/interrupt-controller/irq.h>
 
 / {
-	model = "Phytec AM57xx phyCORE";
-	compatible = "phytec,am57xx-phycore-som", "ti,am5728", "ti,dra742", "ti,dra74", "ti,dra7";
+	model = "PHYTEC phyCORE-AM572x";
+	compatible = "phytec,am572x-phycore-som", "ti,am5728", "ti,dra742", "ti,dra74", "ti,dra7";
 
 	aliases {
 		rtc2 = &rtc;
@@ -95,14 +96,14 @@
 		pinctrl-1 = <&leds_som_pins_sleep>;
 
 		led@0 {
-			label = "am57xx-phycore-som:red";
+			label = "am572x-phycore-som:red";
 			gpios = <&gpio4 9 GPIO_ACTIVE_HIGH>;
 			linux,default-trigger = "heartbeat";
 			default-state = "off";
 		};
 
 		led@1 {
-			label = "am57xx-phycore-som:green";
+			label = "am572x-phycore-som:green";
 			gpios = <&gpio4 10 GPIO_ACTIVE_HIGH>;
 			linux,default-trigger = "cpu0";
 			default-state = "off";
