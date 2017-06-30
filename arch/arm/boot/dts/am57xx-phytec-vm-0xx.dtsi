@@ -13,49 +13,66 @@
  *  - Mux the  enable pins
 */
 
-&i2c3 {
-	vm_009: mt9m111@48 {
-		status = "disabled";
-		compatible = "micron,mt9m111";
-		reg = <0x48>;
+&cam_ext_mclk {
+	status = "okay";
+};
 
-		port {
-			mt9m131_ep: endpoint {
-				status = "disabled";
-				remote-endpoint = <&vin3a>;
+&vcam_fixed {
+	status = "okay";
+};
 
-				hsync-active = <1>;
-				vsync-active = <1>;
-				pclk-sample = <0>;
-				bus-width = <8>;
-			};
+&vm_009 {
+	compatible = "micron,mt9m111";
+	status = "okay";
+
+	reg = <0x48>;
+
+	port {
+		mt9m131_ep: endpoint {
+			status = "okay";
+			remote-endpoint = <&vin3a>;
+
+			hsync-active = <1>;
+			vsync-active = <1>;
+			pclk-sample = <0>;
+			bus-width = <8>;
 		};
 	};
 
-	vm_011: mt9p031@48 {
-		status = "disabled";
-		compatible = "aptina,mt9p031";
-		reg = <0x48>;
+};
 
-		port {
-			mt9p031_ep: endpoint {
-				status = "disabled";
-				remote-endpoint = <&vin3a>;
+&vm_011 {
+	compatible = "aptina,mt9p031";
+	status = "disabled";
 
-				hsync-active = <1>;
-				vsync-active = <1>;
-				pclk-sample = <0>;
-				bus-width = <8>;
-			};
+	reg = <0x48>;
+
+	port {
+		mt9p031_ep: endpoint {
+			status = "disabled";
+			remote-endpoint = <&vin3a>;
+
+			hsync-active = <1>;
+			vsync-active = <1>;
+			pclk-sample = <0>;
+			bus-width = <8>;
+			input-clock-frequency = <26000000>;
+			pixel-clock-frequency = <78000000>;
 		};
 	};
 };
 
+&vip2 {
+	status = "okay";
+};
+
 &vin3a {
-	status = "disabled";
+	status = "okay";
 
 	vin3a_ep: endpoint {
-		status = "disabled";
+		status = "okay";
+
+		remote-endpoint = <&mt9m131_ep>;
 		slave-mode;
 	};
 };
