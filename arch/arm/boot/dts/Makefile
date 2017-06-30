@@ -506,7 +506,7 @@ dtb-$(CONFIG_SOC_DRA7XX) += \
 	am572x-idk-lcd-osd101t2587.dtb \
 	am57xx-evm.dtb \
 	am57xx-evm-reva3.dtb \
-	am57xx-phycore-rdk.dtb \
+	am572x-phycore-rdk.dtb \
 	dra72-evm.dtb \
 	dra72-evm-lcd-lg.dtb \
 	dra72-evm-lcd-osd.dtb \
