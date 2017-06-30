@@ -484,7 +484,7 @@
 		};
 
 		tps659038_rtc: tps659038_rtc {
-			status = "disabled";
+			status = "okay";
 			compatible = "ti,palmas-rtc";
 			interrupt-parent = <&tps659038>;
 			interrupts = <8 IRQ_TYPE_EDGE_FALLING>;
@@ -493,14 +493,14 @@
 	};
 
 	i2c_eeprom: eeprom@50 {
-		status = "disabled";
+		status = "okay";
 		compatible = "at,24c32";
 		reg = <0x50>;
 		pagesize = <32>;
 	};
 
 	i2c_rtc: rtc@68 {
-		status = "disabled";
+		status = "okay";
 		compatible = "rv4162";
 		reg = <0x68>;
 	};
@@ -550,22 +550,22 @@
 	phy_id = <&davinci_mdio>, <1>;
 	phy-mode = "rgmii";
 	dual_emac_res_vlan = <1>;
-	status = "disabled";
+	status = "okay";
 };
 
 &cpsw_emac1 {
-	status = "disabled";
+	status = "okay";
 };
 
 &davinci_mdio {
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&davinci_mdio_pins_default>;
 	pinctrl-1 = <&davinci_mdio_pins_sleep>;
-	status = "disabled";
+	status = "okay";
 };
 
 &mmc2 {
-	status = "disabled";
+	status = "okay";
 	pinctrl-names = "default", "sleep", "hs", "ddr_1_8v";
 	pinctrl-0 = <&mmc2_pins_default>;
 	pinctrl-1 = <&mmc2_pins_sleep>;
@@ -580,7 +580,7 @@
 };
 
 &mcspi1 {
-	status = "disabled";
+	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&mcspi1_pins_default>;
 
@@ -607,18 +607,20 @@
 		phys = <&pcie2_phy>;
 		phy-names = "pcie-phy1";
 		syscon-legacy-mode = <&scm_conf1 0x14 1>;
-		status = "disabled";
+		status = "okay";
 	};
 };
 
 &qspi {
+	status = "okay";
+
 	pinctrl-names = "default";
 	pinctrl-0 = <&qspi1_pins_default &qspi1_iodelay_conf>;
 
 	spi-max-frequency = <76800000>;
 
 	qspi_nor: m25p80@2 {
-		status = "disabled";
+		status = "okay";
 		compatible = "n25q128a13", "jedec,spi-nor";
 
 		reg = <2>;
