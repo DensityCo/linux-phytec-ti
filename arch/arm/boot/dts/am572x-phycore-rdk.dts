@@ -10,8 +10,10 @@
 
 /dts-v1/;
 
-#include "am572x-phycore-som.dtsi"	/* Superset - enables all SOM features */
-#include "am572x-pcm-948.dtsi"		/* Carrier Board */
-#include "am57xx-phytec-lcd-018.dtsi"	/* LCD-018-070-KAP Display */
-#include "am57xx-phytec-vm-0xx.dtsi"	/* PHYCAM-P Camera Adapter Boards */
+#include "am572x-phycore-som.dtsi"    /* Superset - enables all SOM features */
+#include "am572x-pcm-948.dtsi"        /* Carrier Board */
+#include "am57xx-phytec-lcd-018.dtsi" /* LCD-018-070-KAP Display */
+#include "am57xx-phytec-vm-0xx.dtsi"  /* PHYCAM-P Camera Adapter Boards */
 #include "am57xx-phytec-wlan-wilink8.dtsi" /* WiLink8 Adapter Board */
+
+#include "am572x-pcm-057-41300111i.dtsi" /* SOM variant */
