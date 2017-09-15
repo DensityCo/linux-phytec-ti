@@ -209,21 +209,21 @@
 	pinctrl-1 = <&i2c4_pins_sleep>;
 	clock-frequency = <400000>; /* Fast mode - HS mode also possible (max 2.56MHz) */
 
-	currentsensor_12v@65 {
+	ina219@40 {
 		compatible = "ti,ina219";
-		reg = <0x65>;
+		reg = <0x40>;
 		shunt-resistor = <7000>; /* in micro-Ohm */
 	};
 
-	currentsensor_5v_tof@68 {
+	ina219@41 {
 		compatible = "ti,ina219";
-		reg = <0x68>;
+		reg = <0x41>;
 		shunt-resistor = <7000>;
 	};
 
-	currentsensor_12v_tof@69 {
+	ina219@44 {
 		compatible = "ti,ina219";
-		reg = <0x69>;
+		reg = <0x44>;
 		shunt-resistor = <7000>;
 	};
 };
