@@ -302,7 +302,7 @@
 
 &usb2 {
 	status = "okay";
-	dr_mode = "peripheral";
+	dr_mode = "host";
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&usb2_pins_default>;
 	pinctrl-1 = <&usb2_pins_sleep>;
