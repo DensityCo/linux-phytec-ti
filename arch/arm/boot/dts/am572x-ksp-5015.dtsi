@@ -139,6 +139,14 @@
 			0x2e8 (PIN_OUTPUT | MUX_MODE14)	/* mcasp1_axr13.gpio6_4 spare*/
 			0x1e4 (PIN_OUTPUT | MUX_MODE14)	/* vout1_d2.gpio8_2	spare*/
 
+			0x234 (PIN_INPUT | MUX_MODE14)	/* vout1_d22.gpio8_22	appsel0 */
+			0x238 (PIN_INPUT | MUX_MODE14)	/* vout1_d23.gpio8_23	appsel1 */
+
+			0x50  (PIN_INPUT | MUX_MODE14)	/* gpmc_a4.gpio1_26	id0 */
+			0x54  (PIN_INPUT | MUX_MODE14)	/* gpmc_a5.gpio1_27	id1 */
+			0x58  (PIN_INPUT | MUX_MODE14)	/* gpmc_a6.gpio1_28	id2 */
+			0x5c  (PIN_INPUT | MUX_MODE14)	/* gpmc_a7.gpio1_29	id3 */
+
 			0x1e8 (PIN_OUTPUT | MUX_MODE14) /* vout1_d3.gpio8_3	12v_tof */
 			0x178 (PIN_OUTPUT | MUX_MODE14)	/* vin2a_d4.gpio4_5	5v_tof */
 			0x174 (PIN_OUTPUT | MUX_MODE14) /* vin2a_d3.gpio4_4	eeprom ~wc*/
