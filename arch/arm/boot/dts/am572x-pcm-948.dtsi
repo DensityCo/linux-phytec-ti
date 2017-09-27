@@ -829,11 +829,18 @@
 	dual_emac;
 };
 
+&davinci_mdio {
+	phy1: ethernet-phy@2 {
+		reg = <2>;
+	};
+};
+
 &cpsw_emac1 {
-	phy_id = <&davinci_mdio>, <2>;
+	status = "okay";
+
+	phy-handle = <&phy1>;
 	phy-mode = "rgmii";
 	dual_emac_res_vlan = <2>;
-	status = "okay";
 };
 
 &mmc1 {
