@@ -208,6 +208,34 @@
 	pinctrl-0 = <&i2c3_pins_default>;
 	pinctrl-1 = <&i2c3_pins_sleep>;
 	clock-frequency = <400000>;
+
+    pca9633@60 {
+        compatible = "nxp,pca9633";
+        #address-cells = <1>;
+        #size-cells = <0>;
+        reg = <0x60>;
+
+        blue@0 {
+            label = "blue";
+            reg = <0>;
+            linux,default-trigger = "none";
+        };
+        red@1 {
+            label = "red";
+            reg = <1>;
+            linux,default-trigger = "none";
+        };
+        green@2 {
+            label = "green";
+            reg = <2>;
+            linux,default-trigger = "none";
+        };
+        unused@3 {
+            label = "unused";
+            reg = <3>;
+            linux,default-trigger = "none";
+        };
+    };
 };
 
 &i2c4 {
