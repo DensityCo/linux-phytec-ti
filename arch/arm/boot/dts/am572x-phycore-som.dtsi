@@ -60,6 +60,7 @@
 		vin-supply = <&regen1>;
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
+		regulator-always-on;
 	};
 
 	aic_dvdd: fixedregulator-aic_dvdd {
