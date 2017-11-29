@@ -9,6 +9,28 @@
 	model = "Density AM572x KSP-5015";
 	compatible = "phytec,am572x-ksp-5015", "phytec,am572x-phycore-som", "ti,am5728", "ti,dra742", "ti,dra74", "ti,dra7";
 
+/*	vcc_5v_tof: fixedregulator-5v-tof {
+		compatible = "regulator-fixed";
+		regulator-name = "5v_tof";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		regulator-always-on;
+		regulator-boot-on;
+		enable-active-high;
+		gpio = <&gpio4 5 GPIO_ACTIVE_HIGH>;
+	};*/
+/*
+	vcc_12v_tof: fixedregulator-12v-tof {
+		compatible = "regulator-fixed";
+		regulator-name = "12v_tof";
+		regulator-min-microvolt = <12000000>;
+		regulator-max-microvolt = <12000000>;
+               regulator-always-on;
+               regulator-boot-on;
+		enable-active-high;
+		gpio = <&gpio8 3 GPIO_ACTIVE_HIGH>;
+	}; */
+
 	button: gpio-keys {
 		status = "okay";
 		compatible = "gpio-keys";
