@@ -608,6 +608,11 @@ dtb-$(CONFIG_SOC_DRA7XX) += \
 	am57xx-evm-reva3-cam-mt9t111.dtb \
 	am57xx-evm-reva3-cam-ov10635.dtb \
 	am572x-phycore-rdk.dtb \
+	am572x-phycore-rdk-40201111i.dtb \
+	am572x-phycore-rdk-41201111i.dtb \
+	am572x-phycore-rdk-41300111i.dtb \
+	am572x-phycore-rdk-50201111i.dtb \
+	am572x-phycore-rdk-50500111i.dtb \
 	dra72-evm.dtb \
 	dra72-evm-lcd-lg.dtb \
 	dra72-evm-lcd-osd101t2045.dtb \
