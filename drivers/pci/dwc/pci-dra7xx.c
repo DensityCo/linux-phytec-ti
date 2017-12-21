@@ -708,8 +708,6 @@ static int __init dra7xx_pcie_probe(struct platform_device *pdev)
 		return ret;
 	}
 
-	platform_set_drvdata(pdev, dra7xx);
-
 	pm_runtime_enable(dev);
 	ret = pm_runtime_get_sync(dev);
 	if (ret < 0) {
@@ -720,9 +718,6 @@ static int __init dra7xx_pcie_probe(struct platform_device *pdev)
 	reg = dra7xx_pcie_readl(dra7xx, PCIECTRL_DRA7XX_CONF_DEVICE_CMD);
 	reg &= ~LTSSM_EN;
 	dra7xx_pcie_writel(dra7xx, PCIECTRL_DRA7XX_CONF_DEVICE_CMD, reg);
-
-	if (of_property_read_bool(np, "ti,pcie-is-gen1"))
-		dra7xx->is_gen1 = true;
 
 	platform_set_drvdata(pdev, dra7xx);
 
