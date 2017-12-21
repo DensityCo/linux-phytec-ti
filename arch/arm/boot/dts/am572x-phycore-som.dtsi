@@ -532,26 +532,6 @@
 	ti,no-idle-on-init;
 };
 
-&oppdm_mpu {
-	vdd-supply = <&smps12_reg>;
-};
-
-&oppdm_dspeve {
-	vdd-supply = <&smps45_reg>;
-};
-
-&oppdm_gpu {
-	vdd-supply = <&smps45_reg>;
-};
-
-&oppdm_ivahd {
-	vdd-supply = <&smps45_reg>;
-};
-
-&oppdm_core {
-	vdd-supply = <&smps6_reg>;
-};
-
 &mcasp1 {
 	compatible = "ti,dra7-mcasp1-audio";
 	reg = <0x48460000 0x2000>,
