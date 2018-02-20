@@ -855,3 +855,7 @@
 &rtc {
 	status = "okay";
 };
+
+&cpu0 {
+	vdd-supply = <&smps12_reg>;
+};
