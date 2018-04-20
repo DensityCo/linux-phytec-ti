@@ -112,11 +112,6 @@
 	backlight: backlight {
 		compatible = "pwm-backlight";
 		status = "disabled";
-
-		pinctrl-names = "default";
-		pinctrl-0 = <&ehrpwm1a_pin>;
-
-		pwms = <&ehrpwm0 0 50000 0>;
 	};
 
 	lcd2: display {
@@ -400,12 +395,6 @@
 			0x2a8 (PIN_INPUT | MUX_MODE15)
 			0x2ec (PIN_INPUT | MUX_MODE15)
 			0x2f0 (PIN_INPUT | MUX_MODE15)
-		>;
-	};
-
-	ehrpwm1a_pin: ehrpwm1a_pin {
-		pinctrl-single,pins = <
-			0xf4 (PIN_OUTPUT_PULLDOWN | MUX_MODE10) /* vin1a_d0.ehrpwm1A */
 		>;
 	};
 
@@ -696,15 +685,6 @@
 			st,i-drive = <1>;
 		};
 	};
-};
-
-&epwmss0 {
-	status = "okay";
-};
-
-/* ehrpwm0 maps to EHRPWM1 signal name */
-&ehrpwm0 {
-	status = "okay";
 };
 
 &uart3 {

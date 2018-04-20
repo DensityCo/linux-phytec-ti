@@ -32,3 +32,10 @@
 &qspi_nor_cs0 {
 	status = "disabled";
 };
+
+/* backlight is not supported with PCM-948
+ * and the phyCORE-AM571x SOM configurations
+ */
+&backlight {
+	status = "disabled";
+};
