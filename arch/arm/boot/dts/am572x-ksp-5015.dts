@@ -10,4 +10,4 @@
 #include "am572x-phycore-som.dtsi"		/* Superset - enables all SOM features */
 #include "am572x-ksp-5015.dtsi"			/* Carrier Board */
 #include "am572x-pcm-057-41300111i.dtsi"	/* SOM variant */
-
+#include "cmem-dra72x.dtsi"     /* cmem for dsp/eve */
