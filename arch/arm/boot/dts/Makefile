@@ -618,6 +618,7 @@ dtb-$(CONFIG_SOC_DRA7XX) += \
 	am572x-phycore-rdk-40a00111i.dtb \
 	am571x-phycore-rdk-30302111i.dtb \
 	am571x-phycore-rdk-10302111i.dtb \
+	am571x-phycore-rdk-10203110c.dtb \
 	dra72-evm.dtb \
 	dra72-evm-lcd-lg.dtb \
 	dra72-evm-lcd-osd101t2045.dtb \
