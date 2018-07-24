@@ -275,7 +275,7 @@
 			0xC8 (PIN_OUTPUT | SLEWCONTROL | MUX_MODE0)		/* gpmc_oen_ren */
 			0xCC (PIN_OUTPUT | SLEWCONTROL | MUX_MODE0)		/* gpmc_wen */
 			0xD0 (PIN_OUTPUT | SLEWCONTROL | MUX_MODE0)		/* gpmc_ben0 */
-			0xD8 (PIN_INPUT | MUX_MODE0)				/* gpmc_wait0 */
+			0xD8 (PIN_INPUT_SLEW | MUX_MODE14)			/* gpmc_wait0.gpio2_28 */
 			0x16C (PIN_INPUT_PULLUP | MUX_MODE15)			/* vin2a_d1.off */
 		>;
 	};
@@ -723,7 +723,7 @@
 		interrupt-parent = <&gpmc>;
 		interrupts = <0 IRQ_TYPE_NONE>,		/* fifoevent */
 			<1 IRQ_TYPE_NONE>;		/* termcount */
-		rb-gpios = <&gpmc 0 GPIO_ACTIVE_HIGH>;	/* gpmc_wait0 pin */
+		rb-gpios = <&gpio2 28 GPIO_ACTIVE_HIGH>;	/* gpmc_wait0 pin */
 
 		/* Settings for Micron MT29F8G08ABACAWP 1GB NAND */
 		ti,nand-ecc-opt = "bch16";
