@@ -21,6 +21,11 @@
 	status = "okay";
 };
 
+/* timer must be running to enable camera clk */
+&timer5 {
+	status = "okay";
+};
+
 &vm_009 {
 	compatible = "micron,mt9m111";
 	status = "okay";
