@@ -1157,18 +1157,20 @@ static int mt9m111_probe(struct i2c_client *client,
 						 GPIOD_OUT_LOW);
 
 	if (mt9m111->clk) {
-		of_property_read_u32(client->dev.of_node,
+		if (!of_property_read_u32(client->dev.of_node,
 					  "mt9m111,fixed-clock",
-					  &fixed_rate);
-
-		if (fixed_rate < 27000000 || fixed_rate > 54000000) {
-			dev_warn(&client->dev,
-				 "provided mt9m111,fixed-clock rate (%d) is "
-				 "invalid. Setting clock rate to 27000000\n",
-				 fixed_rate);
-			v4l2_clk_set_rate(mt9m111->clk, 27000000);
-		} else
-			v4l2_clk_set_rate(mt9m111->clk, fixed_rate);
+					  &fixed_rate)) {
+			if (fixed_rate < 27000000 || fixed_rate > 54000000) {
+				dev_warn(&client->dev,
+					 "provided mt9m111,fixed-clock rate "
+					 "(%d) is invalid. Setting clock rate "
+					 "to 27000000\n",
+					 fixed_rate);
+				v4l2_clk_set_rate(mt9m111->clk, 27000000);
+			} else {
+				v4l2_clk_set_rate(mt9m111->clk, fixed_rate);
+			}
+		}
 	}
 
 	/* Default HIGHPOWER context */
