@@ -50,7 +50,7 @@
 			0x68 (PIN_INPUT_PULLDOWN | MUX_MODE2 | MODE_SELECT)   /* gpmc_a10.vin3a_de0 */
 			0x6c (PIN_INPUT_PULLDOWN | MUX_MODE2 | MODE_SELECT)   /* gpmc_a11.vin3a_fld0 */
 
-			0xc0 (PIN_OUTPUT | MUX_MODE2)	/* gpmc_clk.clkout1 */
+			0x2a0 (PIN_INPUT | MUX_MODE9)	/* xref_clk3.clkout3 */
 			0x1e4 (PIN_OUTPUT | MUX_MODE14)   /* vout1_d2.gpio8_2 */
 		>;
 	};
@@ -85,6 +85,15 @@
 	};
 };
 
+&timer5 {
+	status = "disabled";
+
+	assigned-clocks = <&timer5_gfclk_mux>, <&clkoutmux0_clk_mux>;
+	assigned-clock-parents = <&clkoutmux0_clk_mux>;
+
+	ti,timer-auto-run;
+};
+
 &i2c3 {
 	vm_009: mt9m111@48 {
 		status = "disabled";
@@ -93,10 +102,13 @@
 		pinctrl-0 = <&cam_pins_default &cam_pins_iodelay_conf>;
 		reset-gpios = <&gpio8 2 1>;
 
-		clocks = <&cam_ext_mclk 0>;
+		clocks = <&clkoutmux0_clk_mux 0>;
 		clock-names = "mclk";
 
-		mt9m111,fixed-clock = <27000000>;
+		assigned-clocks = <&clkoutmux0_clk_mux>, <&l3init_480m_dclk_div>;
+		assigned-clock-parents = <&l3init_480m_dclk_div>;
+		assigned-clock-rates = <0>, <30000000>;
+
 		mt9m111,allow-burst;
 	};
 
