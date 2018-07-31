@@ -857,7 +857,7 @@
 	status = "okay";
 	memory-region = <&dsp1_cma_pool>;
 	mboxes = <&mailbox5 &mbox_dsp1_ipc3x>;
-	timers = <&timer5>;
+	timers = <&timer14>;
 	watchdog-timers = <&timer10>;
 };
 
