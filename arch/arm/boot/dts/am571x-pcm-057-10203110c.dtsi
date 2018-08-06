@@ -40,3 +40,7 @@
 &gpu {
 	status = "disabled";
 };
+
+&i2c_rtc {
+	status = "disabled";
+};
