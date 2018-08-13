@@ -3,6 +3,8 @@
  * Copyright (C) 2018 PHYTEC America, LLC - https://www.phytec.com
  */
 
+#include "../ti/k3-am654.dtsi"
+
 / {
 	model = "PHYTEC phyCORE-AM65x";
 	compatible =  "phytec,am65xx-phycore-som", "ti,am654";
