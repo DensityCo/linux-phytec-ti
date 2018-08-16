@@ -3,6 +3,8 @@
  * Copyright (C) 2018 PHYTEC America, LLC - https://www.phytec.com
  */
 
+#include <dt-bindings/phy/phy.h>
+
 / {
 	model = "PHYTEC phyCORE-AM65x Carrier Board";
 	compatible = "phytec,am65xx-pcm-941", "phytec,am65xx-phycore-som", "ti,am654";
@@ -47,6 +49,16 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&main_mmc1_pins_default>;
 	sdhci-caps-mask = <0x80000007 0x0>;
+};
+
+&pcie1_rc {
+	status = "okay";
+	phys = <&serdes1 PHY_TYPE_PCIE 0>;
+	phy-names = "pcie-phy0";
+};
+
+&serdes1 {
+	status = "okay";
 };
 
 &main_uart1 {
