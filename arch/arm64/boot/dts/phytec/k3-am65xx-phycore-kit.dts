@@ -5,7 +5,7 @@
 
 /dts-v1/;
 
-#include "k3-am65xx-phycore-som.dtsi"		/* Superset - enables all SOM features */
+#include "k3-am65xx-phycore-som.dtsi"		/* Superset - enables most SOM features */
 #include "k3-am65xx-pcm-941.dtsi"		/* Carrier board */
 
 / {
