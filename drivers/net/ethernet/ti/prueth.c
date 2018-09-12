@@ -1608,11 +1608,20 @@ static void emac_adjust_link(struct net_device *ndev)
 static irqreturn_t emac_tx_hardirq(int irq, void *dev_id)
 {
 	struct net_device *ndev = (struct net_device *)dev_id;
-	struct prueth_emac *emac = netdev_priv(ndev);
 
 	if (unlikely(netif_queue_stopped(ndev)))
 		netif_wake_queue(ndev);
 
+	return IRQ_HANDLED;
+}
+
+static irqreturn_t emac_tx_hardirq_ptp(int irq, void *dev_id)
+{
+	struct net_device *ndev = (struct net_device *)dev_id;
+	struct prueth_emac *emac = netdev_priv(ndev);
+
+	if (unlikely(netif_queue_stopped(ndev)))
+		netif_wake_queue(ndev);
 	if (PRUETH_HAS_PTP(emac->prueth) && emac_is_ptp_tx_enabled(emac))
 		prueth_queue_ptp_tx_work(emac);
 
@@ -3070,13 +3079,25 @@ static int emac_ndo_open(struct net_device *ndev)
 		}
 	}
 
-	if (PRUETH_HAS_PTP(prueth) && emac->ptp_tx_irq > 0) {
-		ret = request_irq(emac->ptp_tx_irq,
-				  emac_tx_hardirq, flags,
+	if (PRUETH_HAS_PTP(prueth) && PRUETH_HAS_RED(prueth) &&
+	    emac->hsrprp_ptp_tx_irq > 0) {
+		ret = request_irq(emac->hsrprp_ptp_tx_irq,
+				  emac_tx_hardirq_ptp, flags,
 				  ndev->name, ndev);
 		if (ret) {
-			netdev_err(ndev, "unable to request PTP TX IRQ\n");
+			netdev_err(ndev, "unable to request HSRPRP PTP TX IRQ\n");
 			goto free_irq;
+		}
+	}
+
+	if (PRUETH_HAS_PTP(prueth) && PRUETH_IS_EMAC(prueth) &&
+	    emac->emac_ptp_tx_irq > 0) {
+		ret = request_irq(emac->emac_ptp_tx_irq,
+				  emac_tx_hardirq_ptp, flags,
+				  ndev->name, ndev);
+		if (ret) {
+			netdev_err(ndev, "unable to request EMAC PTP TX IRQ\n");
+			goto free_hsrprp_ptp_irq;
 		}
 	}
 
@@ -3239,8 +3260,13 @@ clean_debugfs_hsr_prp:
 		prueth_hsr_prp_debugfs_term(prueth);
 free_ptp_irq:
 	mutex_unlock(&prueth->mlock);
-	if (PRUETH_HAS_PTP(prueth) && emac->ptp_tx_irq > 0)
-		free_irq(emac->ptp_tx_irq, ndev);
+	if (PRUETH_HAS_PTP(prueth) && PRUETH_IS_EMAC(prueth) &&
+	    emac->emac_ptp_tx_irq > 0)
+		free_irq(emac->emac_ptp_tx_irq, ndev);
+free_hsrprp_ptp_irq:
+	if (PRUETH_HAS_PTP(prueth) && PRUETH_HAS_RED(prueth) &&
+	    emac->hsrprp_ptp_tx_irq > 0)
+		free_irq(emac->hsrprp_ptp_tx_irq, ndev);
 free_irq:
 	if (!PRUETH_HAS_SWITCH(prueth))
 		free_irq(emac->tx_irq, ndev);
@@ -3266,9 +3292,9 @@ static int sw_emac_pru_stop(struct prueth_emac *emac, struct net_device *ndev)
 	free_irq(emac->rx_irq, emac->ndev);
 	disable_irq(emac->rx_irq);
 
-	if (PRUETH_HAS_PTP(prueth) && emac->ptp_tx_irq > 0) {
-		disable_irq(emac->ptp_tx_irq);
-		free_irq(emac->ptp_tx_irq, emac->ndev);
+	if (PRUETH_HAS_PTP(prueth) && emac->hsrprp_ptp_tx_irq > 0) {
+		disable_irq(emac->hsrprp_ptp_tx_irq);
+		free_irq(emac->hsrprp_ptp_tx_irq, emac->ndev);
 		prueth_cancel_ptp_tx_work(emac);
 	}
 
@@ -3316,8 +3342,10 @@ static int emac_pru_stop(struct prueth_emac *emac, struct net_device *ndev)
 	/* disable and free rx and tx interrupts */
 	disable_irq(emac->tx_irq);
 	disable_irq(emac->rx_irq);
+	disable_irq(emac->emac_ptp_tx_irq);
 	free_irq(emac->tx_irq, ndev);
 	free_irq(emac->rx_irq, ndev);
+	free_irq(emac->emac_ptp_tx_irq, ndev);
 
 	return 0;
 }
@@ -4475,8 +4503,9 @@ static int prueth_netdev_init(struct prueth *prueth,
 	emac->prueth = prueth;
 	emac->ndev = ndev;
 	emac->port_id = port;
-	if (PRUETH_HAS_PTP(prueth))
-		tx_int = "ptp_tx";
+
+	if (PRUETH_HAS_PTP(prueth) && !PRUETH_IS_EMAC(prueth))
+		tx_int = "hsrprp_ptp_tx";
 	else
 		tx_int = "tx";
 
@@ -4497,11 +4526,22 @@ static int prueth_netdev_init(struct prueth *prueth,
 	}
 
 	if (PRUETH_HAS_PTP(prueth)) {
-		emac->ptp_tx_irq = of_irq_get_byname(eth_node, "ptp_tx");
-		if (emac->ptp_tx_irq < 0) {
-			ret = emac->ptp_tx_irq;
+		emac->emac_ptp_tx_irq = of_irq_get_byname(eth_node,
+							  "emac_ptp_tx");
+		if (emac->emac_ptp_tx_irq < 0) {
+			ret = emac->emac_ptp_tx_irq;
 			if (ret != -EPROBE_DEFER)
-				dev_info(prueth->dev, "could not get ptp tx irq\n");
+				dev_info(prueth->dev,
+					 "could not get emac ptp tx irq\n");
+		}
+
+		emac->hsrprp_ptp_tx_irq = of_irq_get_byname(eth_node,
+							    "hsrprp_ptp_tx");
+		if (emac->hsrprp_ptp_tx_irq < 0) {
+			ret = emac->hsrprp_ptp_tx_irq;
+			if (ret != -EPROBE_DEFER)
+				dev_info(prueth->dev,
+					 "could not get hsrprp ptp tx irq\n");
 		}
 	}
 
