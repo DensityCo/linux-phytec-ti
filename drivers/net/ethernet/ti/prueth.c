@@ -96,7 +96,7 @@ static int pruss2_fw_drop_untagged;
 module_param(pruss2_fw_drop_untagged, int, 0444);
 MODULE_PARM_DESC(pruss2_fw_drop_untagged, "Drop Untagged VLAN frames at PRU firmware");
 
-const struct prueth_fw_offsets fw_offsets_v1_0 = {
+struct prueth_fw_offsets fw_offsets_v1_0 = {
 	.hash_mask = V1_0_HASH_MASK,
 	.index_array_offset = V1_0_INDEX_ARRAY_NT,
 	.bin_array_offset = V1_0_BIN_ARRAY,
@@ -106,10 +106,13 @@ const struct prueth_fw_offsets fw_offsets_v1_0 = {
 	.nt_array_loc = V1_0_NODE_TABLE_LOC,
 	.index_array_max_entries = V1_0_INDEX_TBL_MAX_ENTRIES,
 	.bin_array_max_entries = V1_0_BIN_TBL_MAX_ENTRIES,
-	.nt_array_max_entries = V1_0_NODE_TBL_MAX_ENTRIES
+	.nt_array_max_entries = V1_0_NODE_TBL_MAX_ENTRIES,
+	/* Set on emac_ndo_open depending on eth_type */
+	.vlan_ctrl_byte = 0,
+	.vlan_filter_tbl = 0
 };
 
-const struct prueth_fw_offsets fw_offsets_v2_1 = {
+struct prueth_fw_offsets fw_offsets_v2_1 = {
 	.hash_mask = V2_1_HASH_MASK,
 	.index_array_offset = V2_1_INDEX_ARRAY_NT,
 	.bin_array_offset = V2_1_BIN_ARRAY,
@@ -119,7 +122,10 @@ const struct prueth_fw_offsets fw_offsets_v2_1 = {
 	.nt_array_loc = V2_1_NODE_TABLE_LOC,
 	.index_array_max_entries = V2_1_INDEX_TBL_MAX_ENTRIES,
 	.bin_array_max_entries = V2_1_BIN_TBL_MAX_ENTRIES,
-	.nt_array_max_entries = V2_1_NODE_TBL_MAX_ENTRIES
+	.nt_array_max_entries = V2_1_NODE_TBL_MAX_ENTRIES,
+	/* Set on emac_ndo_open depending on eth_type */
+	.vlan_ctrl_byte = 0,
+	.vlan_filter_tbl = 0
 };
 
 #define IEP_GLOBAL_CFG_REG_MASK      0xfffff
@@ -3156,7 +3162,25 @@ static int emac_ndo_open(struct net_device *ndev)
 				       IEP_GLOBAL_CFG_REG_MASK,
 				       IEP_GLOBAL_CFG_REG_DEF_VAL);
 		}
+
+		/* Set VLAN filter table offsets */
+		if (prueth->eth_type == 0) {
+			prueth->fw_offsets->vlan_ctrl_byte  =
+				ICSS_EMAC_FW_VLAN_FILTER_CTRL_BITMAP_OFFSET;
+			prueth->fw_offsets->vlan_filter_tbl =
+				ICSS_EMAC_FW_VLAN_FLTR_TBL_BASE_ADDR;
+		} else {
+			prueth->fw_offsets->vlan_ctrl_byte  =
+				VLAN_FLTR_CTRL_BYTE;
+			prueth->fw_offsets->vlan_filter_tbl =
+				VLAN_FLTR_TBL_BASE_ADDR;
+		}
 	}
+
+	/* Init emac debugfs */
+	ret = prueth_debugfs_init(emac);
+	if (ret)
+		goto clean_debugfs_hsr_prp;
 
 	if (PRUETH_HAS_PTP(prueth)) {
 		prueth_init_ptp_tx_work(emac);
@@ -3202,7 +3226,7 @@ static int emac_ndo_open(struct net_device *ndev)
 		ret = emac_set_boot_pru(emac, ndev);
 
 	if (ret)
-		goto clean_debugfs_hsr_prp;
+		goto clean_debugfs_emac;
 
 	if (PRUETH_HAS_RED(prueth)) {
 		/* initialized Network Storm Prevention timer count */
@@ -3234,6 +3258,8 @@ static int emac_ndo_open(struct net_device *ndev)
 
 	return 0;
 
+clean_debugfs_emac:
+	prueth_debugfs_term(emac);
 clean_debugfs_hsr_prp:
 	if (PRUETH_HAS_RED(prueth))
 		prueth_hsr_prp_debugfs_term(prueth);
@@ -3298,6 +3324,10 @@ static int sw_emac_pru_stop(struct prueth_emac *emac, struct net_device *ndev)
 static int emac_pru_stop(struct prueth_emac *emac, struct net_device *ndev)
 {
 	struct prueth *prueth = emac->prueth;
+	u32 vlan_ctrl_byte = prueth->fw_offsets->vlan_ctrl_byte;
+	void __iomem *ram = (emac->port_id == PRUETH_PORT_MII0) ?
+				prueth->mem[PRUETH_MEM_DRAM0].va :
+				prueth->mem[PRUETH_MEM_DRAM1].va;
 
 	prueth->emac_configured &= ~BIT(emac->port_id);
 
@@ -3318,6 +3348,12 @@ static int emac_pru_stop(struct prueth_emac *emac, struct net_device *ndev)
 	disable_irq(emac->rx_irq);
 	free_irq(emac->tx_irq, ndev);
 	free_irq(emac->rx_irq, ndev);
+
+	/* Remove debugfs directory */
+	prueth_debugfs_term(emac);
+
+	/* Disable VLAN filter */
+	writeb(VLAN_FLTR_DIS, ram + vlan_ctrl_byte);
 
 	return 0;
 }
@@ -3779,14 +3815,14 @@ static int emac_add_del_vid(struct prueth_emac *emac,
 			    bool add, __be16 proto, u16 vid)
 {
 	struct prueth *prueth = emac->prueth;
-	void __iomem *sram = prueth->mem[PRUETH_MEM_SHARED_RAM].va;
+	void __iomem *ram = (emac->port_id == PRUETH_PORT_MII0) ?
+				prueth->mem[PRUETH_MEM_DRAM0].va :
+				prueth->mem[PRUETH_MEM_DRAM1].va;
 	u16 index = ((vid >> 3) & 0x1ff);
 	unsigned long flags;
 	u8 val;
-
-	/* VLAN filter support available only in HSR/PRP firmware */
-	if (!PRUETH_HAS_RED(prueth))
-		return 0;
+	u32 vlan_ctrl_byte = prueth->fw_offsets->vlan_ctrl_byte;
+	u32 vlan_filter_tbl = prueth->fw_offsets->vlan_filter_tbl;
 
 	if (proto != htons(ETH_P_8021Q))
 		return -EINVAL;
@@ -3803,15 +3839,15 @@ static int emac_add_del_vid(struct prueth_emac *emac,
 	 * not be added to the table.
 	 */
 	if (vid) {
-		val = readb(sram + VLAN_FLTR_TBL_BASE_ADDR + index);
+		val = readb(ram + vlan_filter_tbl + index);
 		if (add)
 			val |= BIT(vid & 7);
 		else
 			val &= ~BIT(vid & 7);
-		writeb(val, sram + VLAN_FLTR_TBL_BASE_ADDR + index);
+		writeb(val, ram + vlan_filter_tbl + index);
 	}
 
-	/* Enable VLAN filter for HSR/PRP. By default, allow priority
+	/* Enable VLAN filter for. By default, allow priority
 	 * tagged frames to be forwarded to host by enabling the
 	 * corresponding control bit. However when VLAN filter is
 	 * enabled, it caused SV untagged frames to be dropped as well
@@ -3829,9 +3865,9 @@ static int emac_add_del_vid(struct prueth_emac *emac,
 		writeb(VLAN_FLTR_ENA |
 		       (VLAN_FLTR_UNTAG_HOST_RCV_NAL <<
 			VLAN_FLTR_UNTAG_HOST_RCV_CTRL_SHIFT),
-		       sram + VLAN_FLTR_CTRL_BYTE);
+		       ram + vlan_ctrl_byte);
 	else
-		writeb(VLAN_FLTR_ENA, sram + VLAN_FLTR_CTRL_BYTE);
+		writeb(VLAN_FLTR_ENA, ram + vlan_ctrl_byte);
 	spin_unlock_irqrestore(&emac->addr_lock, flags);
 
 	return 0;
@@ -4557,6 +4593,8 @@ static int prueth_netdev_init(struct prueth *prueth,
 		ndev->features |= NETIF_F_HW_PRP_RX_OFFLOAD |
 				  NETIF_F_HW_VLAN_CTAG_FILTER;
 
+	ndev->features |= NETIF_F_HW_VLAN_CTAG_FILTER;
+
 	ndev->hw_features |= (NETIF_F_HW_PRP_RX_OFFLOAD |
 				NETIF_F_HW_HSR_RX_OFFLOAD |
 				NETIF_F_HW_L2FW_DOFFLOAD |
@@ -4845,8 +4883,6 @@ static int prueth_probe(struct platform_device *pdev)
 			dev_err(dev, "can't register netdev for port MII0");
 			goto netdev_exit;
 		}
-
-		prueth_debugfs_init(prueth->emac[PRUETH_MAC0]);
 		prueth_sysfs_init(prueth->emac[PRUETH_MAC0]);
 		prueth->registered_netdevs[PRUETH_MAC0] = prueth->emac[PRUETH_MAC0]->ndev;
 	}
@@ -4857,8 +4893,6 @@ static int prueth_probe(struct platform_device *pdev)
 			dev_err(dev, "can't register netdev for port MII1");
 			goto netdev_unregister;
 		}
-
-		prueth_debugfs_init(prueth->emac[PRUETH_MAC1]);
 		prueth_sysfs_init(prueth->emac[PRUETH_MAC1]);
 		prueth->registered_netdevs[PRUETH_MAC1] = prueth->emac[PRUETH_MAC1]->ndev;
 	}

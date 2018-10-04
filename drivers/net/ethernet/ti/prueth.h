@@ -446,7 +446,7 @@ enum fw_revision {
 	FW_REV_V2_1
 };
 
-/* Node Table (nt) offsets/size information */
+/* Firmware offsets/size information */
 struct prueth_fw_offsets {
 	u32 index_array_offset;
 	u32 bin_array_offset;
@@ -457,6 +457,8 @@ struct prueth_fw_offsets {
 	u32 index_array_max_entries;
 	u32 bin_array_max_entries;
 	u32 nt_array_max_entries;
+	u32 vlan_ctrl_byte;
+	u32 vlan_filter_tbl;
 	u16 hash_mask;
 };
 
@@ -525,6 +527,7 @@ struct prueth_emac {
 #ifdef	CONFIG_DEBUG_FS
 	struct dentry *root_dir;
 	struct dentry *stats_file;
+	struct dentry *vlan_filter_file;
 #endif
 #ifdef CONFIG_SYSFS
 	struct device_attribute nsp_credit_attr;
@@ -617,7 +620,7 @@ struct prueth {
 	struct prueth_emac *emac[PRUETH_NUM_MACS];
 	struct net_device *registered_netdevs[PRUETH_NUM_MACS];
 	const struct prueth_private_data *fw_data;
-	const struct prueth_fw_offsets *fw_offsets;
+	struct prueth_fw_offsets *fw_offsets;
 	int pruss_id;
 	size_t ocmc_ram_size;
 	unsigned int eth_type;
