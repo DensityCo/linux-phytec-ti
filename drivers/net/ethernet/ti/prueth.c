@@ -335,10 +335,18 @@ static u8 pruptp_ts_msgtype(struct sk_buff *skb)
 #define TS_FIELD_SIZE	12
 #define NUM_TS_EVENTS	3
 
-static void pruptp_reset_tx_ts(struct prueth_emac *emac)
+static void pruptp_reset_tx_ts_reg(struct prueth_emac *emac,
+				   u32 ts_notify_ofs, u32 ts_ofs)
 {
 	struct prueth *prueth = emac->prueth;
 	void __iomem *sram = prueth->mem[PRUETH_MEM_SHARED_RAM].va;
+
+	writeb(0, sram + ts_notify_ofs);
+	iep_reset_timestamp(prueth->iep, ts_ofs);
+}
+
+static void pruptp_reset_tx_msg_ts(struct prueth_emac *emac, u8 msg_t)
+{
 	u32 ts_notify_ofs, ts_ofs;
 
 	/* SYNC notify */
@@ -347,20 +355,27 @@ static void pruptp_reset_tx_ts(struct prueth_emac *emac)
 	ts_notify_ofs = TX_TS_NOTIFICATION_OFFSET_SYNC_P1 +
 			NUM_TS_EVENTS * TS_NOTIFY_SIZE *
 			(emac->port_id - 1);
-	writeb(0, sram + ts_notify_ofs);
-	iep_reset_timestamp(prueth->iep, ts_ofs);
 
-	/* PDELAY_REQ */
-	ts_ofs += TS_FIELD_SIZE;
-	ts_notify_ofs += TS_NOTIFY_SIZE;
-	writeb(0, sram + ts_notify_ofs);
-	iep_reset_timestamp(prueth->iep, ts_ofs);
+	if (msg_t == PTP_PDLY_REQ_MSG_ID) {
+		ts_ofs += TS_FIELD_SIZE;
+		ts_notify_ofs += TS_NOTIFY_SIZE;
+	} else if (msg_t == PTP_PDLY_RSP_MSG_ID) {
+		ts_ofs += (2 * TS_FIELD_SIZE);
+		ts_notify_ofs += (2 * TS_NOTIFY_SIZE);
+	} else if (msg_t != PTP_SYNC_MSG_ID) {
+		netdev_err(emac->ndev,
+			   "Can't reset tx ts: unknown msg_t %u\n", msg_t);
+		return;
+	}
 
-	/* PDELAY_RSP */
-	ts_ofs += TS_FIELD_SIZE;
-	ts_notify_ofs += TS_NOTIFY_SIZE;
-	writeb(0, sram + ts_notify_ofs);
-	iep_reset_timestamp(prueth->iep, ts_ofs);
+	pruptp_reset_tx_ts_reg(emac, ts_notify_ofs, ts_ofs);
+}
+
+static void pruptp_reset_tx_ts(struct prueth_emac *emac)
+{
+	pruptp_reset_tx_msg_ts(emac, PTP_SYNC_MSG_ID);
+	pruptp_reset_tx_msg_ts(emac, PTP_PDLY_REQ_MSG_ID);
+	pruptp_reset_tx_msg_ts(emac, PTP_PDLY_RSP_MSG_ID);
 }
 
 static int pruptp_proc_tx_ts(struct prueth_emac *emac,
