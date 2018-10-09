@@ -1520,10 +1520,10 @@ static inline int emac_tx_ts_enqueue(struct prueth_emac *emac,
 
 	spin_lock_irqsave(&emac->ev_msg_lock, flags);
 	if (emac->tx_ev_msg[msg_t]) {
-		spin_unlock_irqrestore(&emac->ev_msg_lock, flags);
-		netdev_err(emac->ndev, "msg %u finds ts queue occupied\n",
-			   msg_t);
-		return -EBUSY;
+		dev_consume_skb_any(emac->tx_ev_msg[msg_t]);
+		pruptp_reset_tx_msg_ts(emac, msg_t);
+		netdev_warn(emac->ndev,
+			    "Dropped msg %u waiting for tx ts.\n", msg_t);
 	}
 
 	skb_get(skb);
