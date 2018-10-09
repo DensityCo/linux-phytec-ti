@@ -459,6 +459,9 @@ struct prueth_fw_offsets {
 	u32 nt_array_max_entries;
 	u32 vlan_ctrl_byte;
 	u32 vlan_filter_tbl;
+	u32 mc_ctrl_byte;
+	u32 mc_filter_mask;
+	u32 mc_filter_tbl;
 	u16 hash_mask;
 };
 
@@ -523,11 +526,13 @@ struct prueth_emac {
 	spinlock_t addr_lock;
 	unsigned int nsp_timer_count;
 	unsigned int nsp_credit;
+	unsigned char mc_mac_mask[ETH_ALEN];
 	struct kobject kobj;
 #ifdef	CONFIG_DEBUG_FS
 	struct dentry *root_dir;
 	struct dentry *stats_file;
 	struct dentry *vlan_filter_file;
+	struct dentry *mc_filter_file;
 #endif
 #ifdef CONFIG_SYSFS
 	struct device_attribute nsp_credit_attr;
@@ -624,7 +629,6 @@ struct prueth {
 	int pruss_id;
 	size_t ocmc_ram_size;
 	unsigned int eth_type;
-	unsigned char sw_mc_mac_mask[ETH_ALEN];
 	unsigned int hsr_mode;
 	unsigned int emac_configured;
 	unsigned int tbl_check_period;

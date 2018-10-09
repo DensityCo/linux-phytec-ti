@@ -294,22 +294,28 @@ static const struct file_operations prueth_vlan_filter_fops = {
 	.release = single_release,
 };
 
-/* prueth_hsr_prp_mc_filter_show - Formats and prints mc_filter entries
+/* prueth_mc_filter_show - Formats and prints mc_filter entries
  */
 static int
-prueth_hsr_prp_mc_filter_show(struct seq_file *sfp, void *data)
+prueth_mc_filter_show(struct seq_file *sfp, void *data)
 {
-	struct prueth *prueth = (struct prueth *)sfp->private;
-	void __iomem *dram1 = prueth->mem[PRUETH_MEM_DRAM1].va;
+	struct prueth_emac *emac = (struct prueth_emac *)sfp->private;
+	struct prueth *prueth = emac->prueth;
+	void __iomem *ram = (emac->port_id == PRUETH_PORT_MII0) ?
+				prueth->mem[PRUETH_MEM_DRAM0].va :
+				prueth->mem[PRUETH_MEM_DRAM1].va;
 	u8 val;
 	int i;
+	u32 mc_ctrl_byte = prueth->fw_offsets->mc_ctrl_byte;
+	u32 mc_filter_mask = prueth->fw_offsets->mc_filter_mask;
+	u32 mc_filter_tbl = prueth->fw_offsets->mc_filter_tbl;
 
-	val = readb(dram1 + M_MULTICAST_TABLE_SEARCH_OP_CONTROL_BIT);
+	val = readb(ram + mc_ctrl_byte);
 
 	seq_printf(sfp, "MC Filter : %s", val ? "enabled\n" : "disabled\n");
 	seq_puts(sfp, "MC Mask : ");
 	for (i = 0; i < 6; i++) {
-		val = readb(dram1 + MULTICAST_FILTER_MASK + i);
+		val = readb(ram + mc_filter_mask + i);
 		if (i == 5)
 			seq_printf(sfp, "%x", val);
 		else
@@ -317,12 +323,12 @@ prueth_hsr_prp_mc_filter_show(struct seq_file *sfp, void *data)
 	}
 	seq_puts(sfp, "\n");
 
-	val = readb(dram1 + M_MULTICAST_TABLE_SEARCH_OP_CONTROL_BIT);
+	val = readb(ram + mc_ctrl_byte);
 	seq_puts(sfp, "MC Filter table below 1 - Allowed, 0 - Dropped\n");
 
 	if (val) {
 		for (i = 0; i < MULTICAST_TABLE_SIZE; i++) {
-			val = readb(dram1 + MULTICAST_FILTER_TABLE + i);
+			val = readb(ram + mc_filter_tbl + i);
 			if (!(i % 16))
 				seq_printf(sfp, "\n%3x: ", i);
 			seq_printf(sfp, "%d ", val);
@@ -333,22 +339,21 @@ prueth_hsr_prp_mc_filter_show(struct seq_file *sfp, void *data)
 	return 0;
 }
 
-/* prueth_hsr_prp_mc_filter_open - Open the mc_filter file
+/* prueth_mc_filter_open - Open the mc_filter file
  *
  * Description:
- * This routine opens a debugfs file mc_filter of specific hsr
- * or prp device
+ * This routine opens a debugfs file mc_filter
  */
 static int
-prueth_hsr_prp_mc_filter_open(struct inode *inode, struct file *filp)
+prueth_mc_filter_open(struct inode *inode, struct file *filp)
 {
-	return single_open(filp, prueth_hsr_prp_mc_filter_show,
+	return single_open(filp, prueth_mc_filter_show,
 			   inode->i_private);
 }
 
-static const struct file_operations prueth_hsr_prp_mc_filter_fops = {
+static const struct file_operations prueth_mc_filter_fops = {
 	.owner	= THIS_MODULE,
-	.open	= prueth_hsr_prp_mc_filter_open,
+	.open	= prueth_mc_filter_open,
 	.read	= seq_read,
 	.llseek = seq_lseek,
 	.release = single_release,
@@ -515,8 +520,9 @@ int prueth_hsr_prp_debugfs_init(struct prueth *prueth)
 	prueth->node_tbl_file = de;
 
 	de = debugfs_create_file("mc_filter", S_IFREG | 0444,
-				 prueth->root_dir, prueth,
-				 &prueth_hsr_prp_mc_filter_fops);
+				 prueth->root_dir,
+				 prueth->emac[PRUETH_PORT_MII0],
+				 &prueth_mc_filter_fops);
 	if (!de) {
 		dev_err(dev, "Cannot create hsr-prp mc_filter file\n");
 		goto error;
@@ -589,6 +595,7 @@ prueth_debugfs_term(struct prueth_emac *emac)
 	emac->stats_file = NULL;
 	emac->root_dir = NULL;
 	emac->vlan_filter_file = NULL;
+	emac->mc_filter_file = NULL;
 }
 
 /* prueth_debugfs_init - create  debugfs file for displaying queue stats
@@ -628,6 +635,15 @@ int prueth_debugfs_init(struct prueth_emac *emac)
 	emac->stats_file = de;
 
 	if (PRUETH_IS_EMAC(emac->prueth)) {
+		de = debugfs_create_file("mc_filter", S_IFREG | 0444,
+					 emac->root_dir, emac,
+					 &prueth_mc_filter_fops);
+		if (!de) {
+			netdev_err(emac->ndev, "Cannot create mc_filter file\n");
+			goto error;
+		}
+		emac->prueth->mc_filter_file = de;
+
 		de = debugfs_create_file("vlan_filter", S_IFREG | 0444,
 					 emac->root_dir, emac,
 					 &prueth_vlan_filter_fops);
