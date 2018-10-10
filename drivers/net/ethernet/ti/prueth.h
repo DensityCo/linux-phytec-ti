@@ -268,6 +268,11 @@ struct lre_statistics {
 	u32 lre_cnt_sup_pru1; /* count of supervisor frames to host on PRU 1 */
 } __packed;
 
+struct emac_statistics {
+	u32 vlan_dropped;
+	u32 multicast_dropped;
+} __packed;
+
 struct prueth_hsr_prp_node {
 	u8 mac[6];
 	u8 state;
@@ -640,6 +645,7 @@ struct prueth {
 	struct prueth_mmap_sram_cfg mmap_sram_cfg;
 	struct prueth_mmap_ocmc_cfg mmap_ocmc_cfg;
 	struct lre_statistics lre_stats;
+	struct emac_statistics emac_stats;
 	struct iep *iep;
 	unsigned int rx_pacing_timeout;
 	/* To provide a synchronization point to wait before proceed to port

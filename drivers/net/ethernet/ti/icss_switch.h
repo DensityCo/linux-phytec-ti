@@ -208,8 +208,15 @@
 #define ICSS_EMAC_TTS_BASE_OFFSET	DRAM_START_OFFSET
 
 /* VLAN table Offsets */
+/* Size requirements for VLAN filtering feature : 4096 bits = 512 bytes */
+#define ICSS_EMAC_FW_VLAN_FILTER_TABLE_SIZE_BYTES                      512
+#define ICSS_EMAC_FW_VLAN_FILTER_CTRL_SIZE_BYTES                         1
+#define ICSS_EMAC_FW_VLAN_FILTER_DROP_CNT_SIZE_BYTES                     4
 #define ICSS_EMAC_FW_VLAN_FLTR_TBL_BASE_ADDR             0x200
 #define ICSS_EMAC_FW_VLAN_FILTER_CTRL_BITMAP_OFFSET      0xEF
+#define ICSS_EMAC_FW_VLAN_FILTER_DROP_CNT_OFFSET \
+	(ICSS_EMAC_FW_VLAN_FILTER_CTRL_BITMAP_OFFSET + \
+	 ICSS_EMAC_FW_VLAN_FILTER_CTRL_SIZE_BYTES)
 
 /* Multicast Filtering Offsets */
 /* Size requirements for Multicast filtering feature */

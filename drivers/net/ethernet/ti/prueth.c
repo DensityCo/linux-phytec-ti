@@ -2180,6 +2180,36 @@ static void emac_set_stats(struct prueth_emac *emac,
 	memcpy_fromio(dram + STATISTICS_OFFSET, pstats, sizeof(*pstats));
 }
 
+static void emac_dualemac_get_stats(struct prueth_emac *emac,
+				    struct emac_statistics *pstats)
+{
+	void __iomem *ram = (emac->port_id == PRUETH_PORT_MII0) ?
+				emac->prueth->mem[PRUETH_MEM_DRAM0].va :
+				emac->prueth->mem[PRUETH_MEM_DRAM1].va;
+
+	memcpy_fromio(&pstats->vlan_dropped,
+		      ram + ICSS_EMAC_FW_VLAN_FILTER_DROP_CNT_OFFSET,
+		      sizeof(pstats->vlan_dropped));
+	memcpy_fromio(&pstats->multicast_dropped,
+		      ram + ICSS_EMAC_FW_MULTICAST_FILTER_DROP_CNT_OFFSET,
+		      sizeof(pstats->multicast_dropped));
+}
+
+static void emac_dualemac_set_stats(struct prueth_emac *emac,
+				    struct emac_statistics *pstats)
+{
+	void __iomem *ram = (emac->port_id == PRUETH_PORT_MII0) ?
+				emac->prueth->mem[PRUETH_MEM_DRAM0].va :
+				emac->prueth->mem[PRUETH_MEM_DRAM1].va;
+
+	memcpy_fromio(ram + ICSS_EMAC_FW_VLAN_FILTER_DROP_CNT_OFFSET,
+		      &pstats->vlan_dropped,
+		      sizeof(pstats->vlan_dropped));
+	memcpy_fromio(ram + ICSS_EMAC_FW_MULTICAST_FILTER_DROP_CNT_OFFSET,
+		      &pstats->multicast_dropped,
+		      sizeof(pstats->multicast_dropped));
+}
+
 static void emac_lre_get_stats(struct prueth_emac *emac,
 			       struct lre_statistics *pstats)
 {
@@ -2257,6 +2287,8 @@ static int emac_set_boot_pru(struct prueth_emac *emac, struct net_device *ndev)
 
 	pru_firmwares = &prueth->fw_data->fw_pru[emac->port_id - 1];
 	fw_name = pru_firmwares->fw_name[prueth->eth_type];
+
+	emac_dualemac_set_stats(emac, &prueth->emac_stats);
 
 	switch (emac->port_id) {
 	case PRUETH_PORT_MII0:
@@ -3375,7 +3407,10 @@ static int emac_pru_stop(struct prueth_emac *emac, struct net_device *ndev)
 		/* switch mode not supported yet */
 		netdev_err(ndev, "invalid port\n");
 	}
-	/* disable and free rx and tx interrupts */
+
+	emac_dualemac_get_stats(emac, &emac->prueth->emac_stats);
+
+	/* disable and free rx and ptp_tx/tx interrupts */
 	disable_irq(emac->tx_irq);
 	disable_irq(emac->rx_irq);
 	free_irq(emac->tx_irq, ndev);
@@ -4112,6 +4147,15 @@ static const struct {
 	{"lreCntSupPru1", PRUETH_LRE_STAT_OFS(lre_cnt_sup_pru1)},
 };
 
+#define PRUETH_EMAC_STAT_OFS(m) offsetof(struct emac_statistics, m)
+static const struct {
+	char string[ETH_GSTRING_LEN];
+	u32 offset;
+} prueth_ethtool_emac_stats[] = {
+	{"emacMulticastDropped", PRUETH_EMAC_STAT_OFS(multicast_dropped)},
+	{"emacVlanDropped", PRUETH_EMAC_STAT_OFS(vlan_dropped)},
+};
+
 static int emac_get_sset_count(struct net_device *ndev, int stringset)
 {
 	struct prueth_emac *emac = netdev_priv(ndev);
@@ -4123,6 +4167,8 @@ static int emac_get_sset_count(struct net_device *ndev, int stringset)
 
 		if (PRUETH_HAS_RED(emac->prueth))
 			a_size += ARRAY_SIZE(prueth_ethtool_lre_stats);
+		else if (PRUETH_IS_EMAC(emac->prueth))
+			a_size += ARRAY_SIZE(prueth_ethtool_emac_stats);
 
 		return a_size;
 	default:
@@ -4144,13 +4190,20 @@ static void emac_get_strings(struct net_device *ndev, u32 stringset, u8 *data)
 			p += ETH_GSTRING_LEN;
 		}
 
-		if (!PRUETH_HAS_RED(emac->prueth))
-			break;
-
-		for (i = 0; i < ARRAY_SIZE(prueth_ethtool_lre_stats); i++) {
-			memcpy(p, prueth_ethtool_lre_stats[i].string,
-			       ETH_GSTRING_LEN);
-			p += ETH_GSTRING_LEN;
+		if (PRUETH_HAS_RED(emac->prueth)) {
+			for (i = 0; i < ARRAY_SIZE(prueth_ethtool_lre_stats);
+			     i++) {
+				memcpy(p, prueth_ethtool_lre_stats[i].string,
+				       ETH_GSTRING_LEN);
+				p += ETH_GSTRING_LEN;
+			}
+		} else if (PRUETH_IS_EMAC(emac->prueth)) {
+			for (i = 0; i < ARRAY_SIZE(prueth_ethtool_emac_stats);
+			     i++) {
+				memcpy(p, prueth_ethtool_emac_stats[i].string,
+				       ETH_GSTRING_LEN);
+				p += ETH_GSTRING_LEN;
+			}
 		}
 		break;
 	default:
@@ -4214,7 +4267,8 @@ static void emac_get_ethtool_stats(struct net_device *ndev,
 	int i;
 	void *ptr;
 	struct lre_statistics lre_stats;
-	int lre_start;
+	struct emac_statistics emac_stats;
+	int lre_start, emac_start;
 
 	emac_get_stats(emac, &pstats);
 
@@ -4233,6 +4287,16 @@ static void emac_get_ethtool_stats(struct net_device *ndev,
 			ptr += prueth_ethtool_lre_stats[i].offset;
 			val = *(u32 *)ptr;
 			data[lre_start + i] = val;
+		}
+	}
+	if (PRUETH_IS_EMAC(emac->prueth)) {
+		emac_dualemac_get_stats(emac, &emac_stats);
+		emac_start = ARRAY_SIZE(prueth_ethtool_stats);
+		for (i = 0; i < ARRAY_SIZE(prueth_ethtool_emac_stats); i++) {
+			ptr = &emac_stats;
+			ptr += prueth_ethtool_emac_stats[i].offset;
+			val = *(u32 *)ptr;
+			data[emac_start + i] = val;
 		}
 	}
 }
