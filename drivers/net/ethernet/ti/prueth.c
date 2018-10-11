@@ -1425,8 +1425,8 @@ static int prueth_hsr_prp_protocol_init(struct prueth *prueth)
 	return 0;
 }
 
-/* Assumes HAS_RED */
-static enum hrtimer_restart prueth_red_table_timer(struct hrtimer *timer)
+/* Handles node table update (if HSR/PRP) and storm prevention */
+static enum hrtimer_restart prueth_timer(struct hrtimer *timer)
 {
 	struct prueth *prueth = container_of(timer, struct prueth,
 					     tbl_check_timer);
@@ -1459,28 +1459,31 @@ static enum hrtimer_restart prueth_red_table_timer(struct hrtimer *timer)
 		}
 	}
 
-	if (prueth->node_table_clear) {
-		pru_spin_lock(prueth->nt);
-		spin_lock_irqsave(&prueth->nt_lock, flags);
-		node_table_init(prueth);
-		spin_unlock_irqrestore(&prueth->nt_lock, flags);
-		/* we don't have to release the prueth lock
-		 * the note_table_init() cleares it anyway
-		 */
-		prueth->node_table_clear = 0;
-	} else {
-		prueth->tbl_check_mask &= ~HOST_TIMER_NODE_TABLE_CLEAR_BIT;
+	if (PRUETH_HAS_RED(prueth)) {
+		if (prueth->node_table_clear) {
+			pru_spin_lock(prueth->nt);
+			spin_lock_irqsave(&prueth->nt_lock, flags);
+			node_table_init(prueth);
+			spin_unlock_irqrestore(&prueth->nt_lock, flags);
+			/* we don't have to release the prueth lock
+			 * the note_table_init() cleares it anyway
+			 */
+			prueth->node_table_clear = 0;
+		} else {
+			prueth->tbl_check_mask &=
+				~HOST_TIMER_NODE_TABLE_CLEAR_BIT;
+		}
+
+		/* schedule work here */
+		kthread_queue_work(prueth->nt_kworker, &prueth->nt_work);
+
+		dram =  prueth->mem[PRUETH_MEM_DRAM1].va;
+		writel(prueth->tbl_check_mask, dram + HOST_TIMER_CHECK_FLAGS);
 	}
-
-	/* schedule work here */
-	kthread_queue_work(prueth->nt_kworker, &prueth->nt_work);
-
-	dram =  prueth->mem[PRUETH_MEM_DRAM1].va;
-	writel(prueth->tbl_check_mask, dram + HOST_TIMER_CHECK_FLAGS);
 	return HRTIMER_RESTART;
 }
 
-static int prueth_init_red_table_timer(struct prueth *prueth)
+static int prueth_init_timer(struct prueth *prueth)
 {
 	if (prueth->emac_configured)
 		return 0;
@@ -1488,7 +1491,7 @@ static int prueth_init_red_table_timer(struct prueth *prueth)
 	hrtimer_init(&prueth->tbl_check_timer, CLOCK_MONOTONIC,
 		     HRTIMER_MODE_REL);
 	prueth->tbl_check_period = MS_TO_NS(PRUETH_RED_TABLE_CHECK_PERIOD_MS);
-	prueth->tbl_check_timer.function = prueth_red_table_timer;
+	prueth->tbl_check_timer.function = prueth_timer;
 	prueth->tbl_check_mask = (HOST_TIMER_NODE_TABLE_CHECK_BIT |
 				  HOST_TIMER_HOST_TABLE_CHECK_BIT);
 
@@ -1498,14 +1501,15 @@ static int prueth_init_red_table_timer(struct prueth *prueth)
 	return 0;
 }
 
-static int prueth_start_red_table_timer(struct prueth *prueth)
+static int prueth_start_timer(struct prueth *prueth)
 {
 	void __iomem *dram1 = prueth->mem[PRUETH_MEM_DRAM1].va;
 
 	if (prueth->emac_configured)
 		return 0;
 
-	writel(prueth->tbl_check_mask, dram1 + HOST_TIMER_CHECK_FLAGS);
+	if (PRUETH_HAS_RED(prueth))
+		writel(prueth->tbl_check_mask, dram1 + HOST_TIMER_CHECK_FLAGS);
 
 	hrtimer_start(&prueth->tbl_check_timer,
 		      ktime_set(0, prueth->tbl_check_period),
@@ -3276,8 +3280,9 @@ static int emac_ndo_open(struct net_device *ndev)
 	else
 		prueth_emac_config(prueth, emac);
 
+	prueth_init_timer(prueth);
+
 	if (PRUETH_HAS_RED(prueth)) {
-		prueth_init_red_table_timer(prueth);
 		prueth_hsr_prp_config(prueth);
 	}
 
@@ -3292,11 +3297,9 @@ static int emac_ndo_open(struct net_device *ndev)
 	if (ret)
 		goto clean_debugfs_emac;
 
-	if (PRUETH_HAS_RED(prueth)) {
-		/* initialized Network Storm Prevention timer count */
-		emac->nsp_timer_count = PRUETH_DEFAULT_NSP_TIMER_COUNT;
-		prueth_start_red_table_timer(prueth);
-	}
+	/* initialized Network Storm Prevention timer count */
+	emac->nsp_timer_count = PRUETH_DEFAULT_NSP_TIMER_COUNT;
+	prueth_start_timer(prueth);
 
 	/* Configure ecap for interrupt pacing, Don't
 	 * check return value here as this returns
@@ -3419,6 +3422,7 @@ static int emac_pru_stop(struct prueth_emac *emac, struct net_device *ndev)
 	/* Remove debugfs directory */
 	prueth_debugfs_term(emac);
 
+	hrtimer_cancel(&prueth->tbl_check_timer);
 	/* Disable VLAN filter */
 	writeb(VLAN_FLTR_DIS, ram + vlan_ctrl_byte);
 
