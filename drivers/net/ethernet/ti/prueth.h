@@ -533,6 +533,11 @@ struct prueth_emac {
 	int ptp_tx_enable;
 	int ptp_rx_enable;
 	int ptp_tx_irq;
+
+	struct tx_ev_cb_data  ct_evt_cb[PTP_DLY_REQ_MSG_ID + 1];
+	spinlock_t            ct_lock; /* serialize accesses to ct_ev_msg[] */
+	struct kthread_worker         *ct_kworker;
+	struct kthread_delayed_work    ct_work;
 };
 
 struct prueth_mmap_port_cfg_basis {
