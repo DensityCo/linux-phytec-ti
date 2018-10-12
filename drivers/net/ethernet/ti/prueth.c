@@ -2195,10 +2195,8 @@ static int emac_calculate_queue_offsets(struct prueth *prueth,
 
 /* EMAC/Switch/HSR/PRP defaults. */
 static u16 txq_size_defaults[NUM_QUEUES] = {97, 97, 97, 97};
-/* switch/HSR/PRP */
-static u16 sw_rxq_size_defaults[NUM_QUEUES] = {206, 206, 206, 206};
-/* EMAC */
-static u16 emac_rxq_size_defaults[NUM_QUEUES] = {194, 194, 194, 194};
+/* EMAC/switch/HSR/PRP defaults */
+static u16 rxq_size_defaults[NUM_QUEUES] = {194, 194, 194, 194};
 
 static int prueth_of_get_queue_sizes(struct prueth *prueth,
 				     struct device_node *np,
@@ -2211,10 +2209,7 @@ static int prueth_of_get_queue_sizes(struct prueth *prueth,
 
 	if (port == PRUETH_PORT_HOST) {
 		propname = "rx-queue-size";
-		if (PRUETH_HAS_SWITCH(prueth))
-			queue_sizes = sw_rxq_size_defaults;
-		else
-			queue_sizes = emac_rxq_size_defaults;
+		queue_sizes = rxq_size_defaults;
 	} else if (port <= PRUETH_PORT_MII1) {
 		propname = "tx-queue-size";
 		queue_sizes = txq_size_defaults;
