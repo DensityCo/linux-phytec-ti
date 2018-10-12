@@ -2193,41 +2193,147 @@ static int emac_calculate_queue_offsets(struct prueth *prueth,
 	return ret;
 }
 
-/* EMAC/Switch/HSR/PRP defaults. */
-static u16 txq_size_defaults[NUM_QUEUES] = {97, 97, 97, 97};
-/* EMAC/switch/HSR/PRP defaults */
-static u16 rxq_size_defaults[NUM_QUEUES] = {194, 194, 194, 194};
+/* EMAC/Switch/HSR/PRP defaults.
+ *
+ * Change the below values only if memory map of BD and OCMC buffers
+ * adjusted to expand the buffers used for Queues. Both BD and OCMC
+ * buffer sizes needs to be in sync.
+ */
+#define PRUETH_TX_QUEUE_SIZE 97
+#define PRUETH_RX_QUEUE_SIZE 194
+static u16 txq_size_defaults[NUM_QUEUES] = {PRUETH_TX_QUEUE_SIZE,
+					    PRUETH_TX_QUEUE_SIZE,
+					    PRUETH_TX_QUEUE_SIZE,
+					    PRUETH_TX_QUEUE_SIZE};
+static u16 rxq_size_defaults[NUM_QUEUES] = {PRUETH_RX_QUEUE_SIZE,
+					    PRUETH_RX_QUEUE_SIZE,
+					    PRUETH_RX_QUEUE_SIZE,
+					    PRUETH_RX_QUEUE_SIZE};
+#define PRUETH_MAX_QUEUE_SIZE ((NUM_QUEUES * PRUETH_TX_QUEUE_SIZE * 2) + \
+			       (NUM_QUEUES * PRUETH_RX_QUEUE_SIZE))
 
-static int prueth_of_get_queue_sizes(struct prueth *prueth,
-				     struct device_node *np,
-				     u16 port)
+static void prueth_copy_queue_sizes(u16 *to_queue_size, u16 *from_queue_size)
+{
+	int i;
+
+	for (i = PRUETH_QUEUE1; i <= PRUETH_QUEUE4; i++)
+		to_queue_size[i] = from_queue_size[i];
+}
+
+/* Get queue sizes from DT and if not available, use default values. Return
+ * true if sizes are obtained from DT. Otherwise return false.
+ */
+static bool prueth_of_get_queue_sizes(struct prueth *prueth,
+				      struct device_node *np,
+				      enum prueth_port port,
+				      struct net_device *ndev)
 {
 	struct prueth_mmap_port_cfg_basis *pb;
-	u16 *queue_sizes;
-	int i;
+	u16 queue_sizes[NUM_QUEUES];
 	char *propname;
+	bool updated = false;
+	int ret;
 
-	if (port == PRUETH_PORT_HOST) {
+	if (port == PRUETH_PORT_HOST)
 		propname = "rx-queue-size";
-		queue_sizes = rxq_size_defaults;
-	} else if (port <= PRUETH_PORT_MII1) {
+	else
 		propname = "tx-queue-size";
-		queue_sizes = txq_size_defaults;
-	} else {
-		return -EINVAL;
-	}
 
+	pb = &prueth->mmap_port_cfg_basis[port];
 	/* Even the read fails, default values will be retained.
 	 * Hence don't check return value and continue to move
 	 * queue sizes (default or new) to port_cfg_basis
 	 */
-	of_property_read_u16_array(np, propname, queue_sizes, NUM_QUEUES);
+	ret = of_property_read_u16_array(np, propname, queue_sizes,
+					 NUM_QUEUES);
+	if (ret) {
+		/* use defaults */
+		prueth_copy_queue_sizes(pb->queue_size,
+					port == PRUETH_PORT_HOST ?
+					rxq_size_defaults : txq_size_defaults);
+	} else {
+		prueth_copy_queue_sizes(pb->queue_size, queue_sizes);
+		updated = true;
+		dev_dbg(&ndev->dev, "Queue sizes for port %d :- %d:%d:%d:%d\n",
+			port,
+			queue_sizes[PRUETH_QUEUE1], queue_sizes[PRUETH_QUEUE2],
+			queue_sizes[PRUETH_QUEUE3], queue_sizes[PRUETH_QUEUE4]);
+	}
 
-	pb = &prueth->mmap_port_cfg_basis[port];
-	for (i = PRUETH_QUEUE1; i <= PRUETH_QUEUE4; i++)
-		pb->queue_size[i] = queue_sizes[i];
+	return updated;
+}
 
-	return 0;
+/* Review the queue sizes in each port and if the total is more than the limit
+ * revert to default values of sizes
+ */
+static void prueth_sanitize_queue_sizes(struct prueth *prueth,
+					struct net_device *ndev)
+{
+	struct prueth_mmap_port_cfg_basis *pb;
+	int i, j, total_size = 0;
+
+	/* validate the queue sizes since total can't go above a limit.
+	 * Since buffer descriptor range is bound to this limit as well
+	 * and there is a 1 to 1 relation between number of blocks in
+	 * OCMC RAM and number of buffer descriptors. Number of buffers
+	 * are decided by defaults which are based on maximum memory
+	 * available. So do a sanity check if user changes the sizes
+	 * through DTS update. Use defaults values to find the upper
+	 * bound. Queue sizes can change as long as BDs are within the
+	 * bound.
+	 */
+	for (i = PRUETH_PORT_HOST; i <= PRUETH_PORT_MII1; i++) {
+		pb = &prueth->mmap_port_cfg_basis[i];
+		for (j = PRUETH_QUEUE1; j <= PRUETH_QUEUE4; j++) {
+			/* can't be zero. At least one buffer needed */
+			if (!pb->queue_size[j])
+				goto err;
+
+			total_size += pb->queue_size[j];
+		}
+	}
+
+	dev_warn(&ndev->dev,
+		 "total_size %d. total_size_allowed %d\n",
+		 total_size, PRUETH_MAX_QUEUE_SIZE);
+
+	if (total_size <= PRUETH_MAX_QUEUE_SIZE)
+		return;
+
+	dev_warn(&ndev->dev,
+		 "Invalid DT Q sizes. Revert to default..\n");
+
+err:
+	for (i = PRUETH_PORT_HOST; i <= PRUETH_PORT_MII1; i++) {
+		pb = &prueth->mmap_port_cfg_basis[i];
+		if (i == PRUETH_PORT_HOST)
+			prueth_copy_queue_sizes(pb->queue_size,
+						rxq_size_defaults);
+		else
+			prueth_copy_queue_sizes(pb->queue_size,
+						txq_size_defaults);
+	}
+}
+
+/* Get queue sizes from DT and validate. Use defaults if config is invalid */
+static void prueth_configure_queue_sizes(struct prueth_emac *emac,
+					 struct device_node *np,
+					 struct device_node *eth_node,
+					 struct prueth_emac *other_emac,
+					 struct device_node *other_eth_node)
+{
+	struct prueth *prueth = emac->prueth;
+	bool dt_updated = false;
+
+	dt_updated = prueth_of_get_queue_sizes(prueth, np, PRUETH_PORT_HOST,
+					       emac->ndev);
+	dt_updated |= prueth_of_get_queue_sizes(prueth, eth_node, emac->port_id,
+						emac->ndev);
+	dt_updated |= prueth_of_get_queue_sizes(prueth, other_eth_node,
+						other_emac->port_id,
+						emac->ndev);
+	if (dt_updated)
+		prueth_sanitize_queue_sizes(prueth, emac->ndev);
 }
 
 static u16 port_queue_size(struct prueth *prueth, int p, int q)
@@ -2835,21 +2941,13 @@ static int emac_ndo_open(struct net_device *ndev)
 	if (!prueth->emac_configured) {
 		if (PRUETH_HAS_HSR(prueth))
 			prueth->hsr_mode = MODEH;
-		ret = prueth_of_get_queue_sizes(prueth, np, PRUETH_PORT_HOST);
-		if (ret < 0)
-			goto free_ptp_irq;
-		ret = prueth_of_get_queue_sizes(prueth, eth_node, port_id);
-		if (ret < 0)
-			goto free_ptp_irq;
+
 		other_port = other_port_id(port_id);
 		/* MAC instance index starts from 0. So index by port_id - 1 */
 		other_emac = prueth->emac[other_port - 1];
 		other_eth_node = prueth->eth_node[other_port - 1];
-		ret = prueth_of_get_queue_sizes(prueth, other_eth_node,
-						other_port);
-		if (ret < 0)
-			goto free_ptp_irq;
-
+		prueth_configure_queue_sizes(emac, np, eth_node,
+					     other_emac, other_eth_node);
 		prueth_init_mmap_configs(prueth);
 
 		emac_calculate_queue_offsets(prueth, eth_node, emac);
