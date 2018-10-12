@@ -3246,9 +3246,11 @@ static int emac_ndo_open(struct net_device *ndev)
 	}
 
 	/* Init emac debugfs */
-	ret = prueth_debugfs_init(emac);
-	if (ret)
-		goto clean_debugfs_hsr_prp;
+	if (PRUETH_IS_EMAC(prueth)) {
+		ret = prueth_dualemac_debugfs_init(emac);
+		if (ret)
+			goto clean_debugfs_hsr_prp;
+	}
 
 	if (PRUETH_HAS_PTP(prueth)) {
 		prueth_init_ptp_tx_work(emac);
@@ -3420,7 +3422,7 @@ static int emac_pru_stop(struct prueth_emac *emac, struct net_device *ndev)
 	free_irq(emac->rx_irq, ndev);
 
 	/* Remove debugfs directory */
-	prueth_debugfs_term(emac);
+	prueth_dualemac_debugfs_term(emac);
 
 	hrtimer_cancel(&prueth->tbl_check_timer);
 	/* Disable VLAN filter */
@@ -5017,6 +5019,7 @@ static int prueth_probe(struct platform_device *pdev)
 			dev_err(dev, "can't register netdev for port MII0");
 			goto netdev_exit;
 		}
+		prueth_debugfs_init(prueth->emac[PRUETH_MAC0]);
 		prueth_sysfs_init(prueth->emac[PRUETH_MAC0]);
 		prueth->registered_netdevs[PRUETH_MAC0] = prueth->emac[PRUETH_MAC0]->ndev;
 	}
@@ -5027,6 +5030,7 @@ static int prueth_probe(struct platform_device *pdev)
 			dev_err(dev, "can't register netdev for port MII1");
 			goto netdev_unregister;
 		}
+		prueth_debugfs_init(prueth->emac[PRUETH_MAC1]);
 		prueth_sysfs_init(prueth->emac[PRUETH_MAC1]);
 		prueth->registered_netdevs[PRUETH_MAC1] = prueth->emac[PRUETH_MAC1]->ndev;
 	}

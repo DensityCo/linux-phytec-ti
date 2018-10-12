@@ -582,6 +582,61 @@ error:
 
 }
 
+/* prueth_dualemac_debugfs_term - Tear down debugfs intrastructure for dual emac
+ *
+ * Description:
+ * When Debufs is configured this routine removes debugfs file system
+ * elements that are specific to dual emac
+ */
+void
+prueth_dualemac_debugfs_term(struct prueth_emac *emac)
+{
+	debugfs_remove(emac->vlan_filter_file);
+	debugfs_remove(emac->mc_filter_file);
+	emac->vlan_filter_file = NULL;
+	emac->mc_filter_file = NULL;
+}
+
+/* prueth_dualemac_debugfs_init - create  debugfs file for dual emac
+ *
+ * Description:
+ * When debugfs is configured this routine creates dual emac debugfs files
+ */
+
+int prueth_dualemac_debugfs_init(struct prueth_emac *emac)
+{
+	int rc = -1;
+	struct dentry *de;
+
+	if (emac->root_dir && !emac->mc_filter_file &&
+	    !emac->vlan_filter_file) {
+		de = debugfs_create_file("mc_filter", S_IFREG | 0444,
+					 emac->root_dir, emac,
+					 &prueth_mc_filter_fops);
+		if (!de) {
+			netdev_err(emac->ndev,
+				   "Cannot create mc_filter file\n");
+			return rc;
+		}
+		emac->mc_filter_file = de;
+
+		de = debugfs_create_file("vlan_filter", S_IFREG | 0444,
+					 emac->root_dir, emac,
+					 &prueth_vlan_filter_fops);
+		if (!de) {
+			netdev_err(emac->ndev,
+				   "Cannot create vlan_filter file\n");
+			goto error;
+		}
+
+		emac->vlan_filter_file = de;
+	}
+	return 0;
+error:
+	prueth_dualemac_debugfs_term(emac);
+	return rc;
+}
+
 /* prueth_debugfs_term - Tear down debugfs intrastructure for emac stats
  *
  * Description:
@@ -635,24 +690,9 @@ int prueth_debugfs_init(struct prueth_emac *emac)
 	emac->stats_file = de;
 
 	if (PRUETH_IS_EMAC(emac->prueth)) {
-		de = debugfs_create_file("mc_filter", S_IFREG | 0444,
-					 emac->root_dir, emac,
-					 &prueth_mc_filter_fops);
-		if (!de) {
-			netdev_err(emac->ndev, "Cannot create mc_filter file\n");
+		rc = prueth_dualemac_debugfs_init(emac);
+		if (rc)
 			goto error;
-		}
-		emac->prueth->mc_filter_file = de;
-
-		de = debugfs_create_file("vlan_filter", S_IFREG | 0444,
-					 emac->root_dir, emac,
-					 &prueth_vlan_filter_fops);
-		if (!de) {
-			netdev_err(emac->ndev, "Cannot create vlan_filter file\n");
-			goto error;
-		}
-
-		emac->prueth->vlan_filter_file = de;
 	}
 
 	return 0;
