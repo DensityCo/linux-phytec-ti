@@ -472,11 +472,16 @@ struct prueth_private_data {
 	u8 ptp_support;
 };
 
+struct tx_ev_cb_data {
+	struct sk_buff *skb;
+	unsigned long tmo;
+};
+
 /* data for each emac port */
 struct prueth_emac {
 	struct prueth *prueth;
 	struct net_device *ndev;
-	struct sk_buff *tx_ev_msg[PTP_PDLY_RSP_MSG_ID + 1]; /* tx ev needs ts */
+	struct tx_ev_cb_data tx_ev_cb[PTP_PDLY_RSP_MSG_ID + 1];
 	spinlock_t ev_msg_lock;
 	u8 mac_addr[6];
 	u32 msg_enable;
