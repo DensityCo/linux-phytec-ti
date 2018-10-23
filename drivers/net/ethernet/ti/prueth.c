@@ -5019,7 +5019,9 @@ static int prueth_probe(struct platform_device *pdev)
 			dev_err(dev, "can't register netdev for port MII0");
 			goto netdev_exit;
 		}
-		prueth_debugfs_init(prueth->emac[PRUETH_MAC0]);
+		ret = prueth_debugfs_init(prueth->emac[PRUETH_MAC0]);
+		if (ret)
+			goto debugfs0_exit;
 		prueth_sysfs_init(prueth->emac[PRUETH_MAC0]);
 		prueth->registered_netdevs[PRUETH_MAC0] = prueth->emac[PRUETH_MAC0]->ndev;
 	}
@@ -5030,7 +5032,9 @@ static int prueth_probe(struct platform_device *pdev)
 			dev_err(dev, "can't register netdev for port MII1");
 			goto netdev_unregister;
 		}
-		prueth_debugfs_init(prueth->emac[PRUETH_MAC1]);
+		ret = prueth_debugfs_init(prueth->emac[PRUETH_MAC1]);
+		if (ret)
+			goto debugfs1_exit;
 		prueth_sysfs_init(prueth->emac[PRUETH_MAC1]);
 		prueth->registered_netdevs[PRUETH_MAC1] = prueth->emac[PRUETH_MAC1]->ndev;
 	}
@@ -5040,12 +5044,17 @@ static int prueth_probe(struct platform_device *pdev)
 
 	return 0;
 
+debugfs1_exit:
+	prueth_debugfs_term(prueth->emac[PRUETH_MAC1]);
+
 netdev_unregister:
 	for (i = 0; i < PRUETH_NUM_MACS; i++) {
 		if (!prueth->registered_netdevs[i])
 			continue;
 		unregister_netdev(prueth->registered_netdevs[i]);
 	}
+debugfs0_exit:
+	prueth_debugfs_term(prueth->emac[PRUETH_MAC0]);
 
 netdev_exit:
 	for (i = 0; i < PRUETH_NUM_MACS; i++) {
