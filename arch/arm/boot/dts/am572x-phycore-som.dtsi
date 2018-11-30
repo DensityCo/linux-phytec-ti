@@ -20,30 +20,30 @@
 		#size-cells = <2>;
 		ranges;
 
-		ipu2_cma_pool: ipu2_cma@95800000 {
+		ipu2_cma_pool: ipu2_cma@94000000 {
 			compatible = "shared-dma-pool";
-			reg = <0x0 0x95800000 0x0 0x3800000>;
+			reg = <0x0 0x94000000 0x0 0x3800000>;
 			reusable;
 			status = "okay";
 		};
 
-		dsp1_cma_pool: dsp1_cma@99000000 {
+		dsp1_cma_pool: dsp1_cma@97800000 {
 			compatible = "shared-dma-pool";
-			reg = <0x0 0x99000000 0x0 0x4000000>;
+			reg = <0x0 0x97800000 0x0 0x4000000>;
 			reusable;
 			status = "okay";
 		};
 
-		ipu1_cma_pool: ipu1_cma@9d000000 {
+		ipu1_cma_pool: ipu1_cma@9b800000 {
 			compatible = "shared-dma-pool";
-			reg = <0x0 0x9d000000 0x0 0x2000000>;
+			reg = <0x0 0x9b800000 0x0 0x2000000>;
 			reusable;
 			status = "okay";
 		};
 
-		dsp2_cma_pool: dsp2_cma@9f000000 {
+		dsp2_cma_pool: dsp2_cma@9d800000 {
 			compatible = "shared-dma-pool";
-			reg = <0x0 0x9f000000 0x0 0x1000000>;
+			reg = <0x0 0x9d800000 0x0 0x1000000>;
 			reusable;
 			status = "okay";
 		};
