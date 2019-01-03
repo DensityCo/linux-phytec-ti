@@ -389,3 +389,8 @@
 	pinctrl-0 = <&pwm3_pins>;
 };
 
+&dss {
+    status = "ok";
+
+    vdda_video-supply = <&ldoln_reg>;
+};
