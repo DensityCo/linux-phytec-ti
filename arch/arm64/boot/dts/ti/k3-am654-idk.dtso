@@ -40,27 +40,11 @@
 					"ti-pruss/am65x-rtu1-prueth-fw.elf";
 			mii-g-rt = <&icssg0_mii_g_rt>;
 			dma-coherent;
-			dmas = <&main_udmap &pruss0_eth 0 UDMA_DIR_TX>,	/* SLICE 0 */
-			       <&main_udmap &pruss0_eth 0 UDMA_DIR_RX>,
-			       <&main_udmap &pruss0_eth 4 UDMA_DIR_TX>,	/* SLICE 1 */
-			       <&main_udmap &pruss0_eth 1 UDMA_DIR_RX>;
+			dmas = <&main_udmap &icssg0 0 UDMA_DIR_TX>,	/* SLICE 0 */
+			       <&main_udmap &icssg0 0 UDMA_DIR_RX>,
+			       <&main_udmap &icssg0 4 UDMA_DIR_TX>,	/* SLICE 1 */
+			       <&main_udmap &icssg0 1 UDMA_DIR_RX>;
 			dma-names = "tx0", "rx0", "tx1", "rx1";
-
-			ti,psil-base = <0x4100>;	/* ICSSG0 PSIL thread start */
-			ti,psil-config0 {
-				linux,udma-mode = <UDMA_PKT_MODE>;
-				ti,psd-size = <0>;
-			};
-
-			ti,psil-config1 {
-				linux,udma-mode = <UDMA_PKT_MODE>;
-				ti,psd-size = <0>;
-			};
-
-			ti,psil-config4 {
-				linux,udma-mode = <UDMA_PKT_MODE>;
-				ti,psd-size = <0>;
-			};
 
 			pruss0_emac0: ethernet-mii0 {
 				phy-handle = <&pruss0_eth0_phy>;
@@ -94,27 +78,11 @@
 					"ti-pruss/am65x-rtu1-prueth-fw.elf";
 			mii-g-rt = <&icssg1_mii_g_rt>;
 			dma-coherent;
-			dmas = <&main_udmap &pruss1_eth 0 UDMA_DIR_TX>,	/* SLICE 0 */
-			       <&main_udmap &pruss1_eth 0 UDMA_DIR_RX>,
-			       <&main_udmap &pruss1_eth 4 UDMA_DIR_TX>,	/* SLICE 1 */
-			       <&main_udmap &pruss1_eth 1 UDMA_DIR_RX>;
+			dmas = <&main_udmap &icssg1 0 UDMA_DIR_TX>,	/* SLICE 0 */
+			       <&main_udmap &icssg1 0 UDMA_DIR_RX>,
+			       <&main_udmap &icssg1 4 UDMA_DIR_TX>,	/* SLICE 1 */
+			       <&main_udmap &icssg1 1 UDMA_DIR_RX>;
 			dma-names = "tx0", "rx0", "tx1", "rx1";
-
-			ti,psil-base = <0x4200>;	/* ICSSG1 PSIL thread start */
-			ti,psil-config0 {
-				linux,udma-mode = <UDMA_PKT_MODE>;
-				ti,psd-size = <0>;
-			};
-
-			ti,psil-config1 {
-				linux,udma-mode = <UDMA_PKT_MODE>;
-				ti,psd-size = <0>;
-			};
-
-			ti,psil-config4 {
-				linux,udma-mode = <UDMA_PKT_MODE>;
-				ti,psd-size = <0>;
-			};
 
 			pruss1_emac0: ethernet-mii0 {
 				phy-handle = <&pruss1_eth0_phy>;
