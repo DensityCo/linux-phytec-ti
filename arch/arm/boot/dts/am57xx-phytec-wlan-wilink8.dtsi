@@ -10,17 +10,10 @@
 /*
  * The board specific DTS file have to:
  *  - Specify WL_EN (wlan_fixed), WL_IRQ (wlcore), and
-      BL_EN (bt_kim) signals for wifi and bluetooth operation
+      BL_EN (bt_fixed) signals for wifi and bluetooth operation
  *  - Mux the WL_EN, WL_IRQ, and BL_EN pins
  *  - Set the node statuses to "okay" in the dts
 */
-
-/ {
-	bt_wilink: btwilink {
-		compatible = "btwilink";
-		status = "okay";
-	};
-};
 
 &wlan_fixed {
 	status = "okay";
@@ -29,13 +22,11 @@
 	regulator-max-microvolt = <1800000>;
 };
 
-/* TODO: enable for bluetooth support */
-&bt_kim {
-	compatible = "kim";
-	status = "disabled";
+&bt_fixed {
+	status = "okay";
 
-	flow_cntrl = <1>;
-	baud_rate = <3686400>;
+	regulator-min-microvolt = <1800000>;
+	regulator-max-microvolt = <1800000>;
 };
 
 &mmc3 {
@@ -52,4 +43,8 @@
 	compatible = "ti,wl1835";
 
 	reg = <2>;
+};
+
+&uart10 {
+	status = "okay";
 };

@@ -137,15 +137,17 @@
 		enable-active-high;
 	};
 
-	/* For bluetooth (wilink8) at connector X26 */
-	bt_kim: kim {
+	bt_fixed: fixedregulator-bt {
+		compatible = "regulator-fixed";
 		status = "disabled";
 
-		pinctrl-names = "default", "sleep";
-		pinctrl-0 = <&bt_pins_default>;
-		pinctrl-1 = <&bt_pins_sleep>;
-		nshutdown_gpio = <22>;  /* GPIO1_22 */
-		dev_name = "/dev/ttyS9"; /* UART10 for BT */
+		pinctrl-names = "default";
+		pinctrl-0 = <&bt_pin_default>;
+
+		regulator-name = "bt_fixed";
+		gpio = <&gpio1 22 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		regulator-always-on;
 	};
 };
 
@@ -219,6 +221,24 @@
 		>;
 	};
 
+	uart10_pins_default: uart10_pins_default {
+		pinctrl-single,pins = <
+			0x170 (PIN_INPUT_SLEW | MUX_MODE8) /* vin2a_d2.uart10.rxd */
+			0x174 (PIN_INPUT_SLEW | MUX_MODE8) /* vin2a_d3.uart10.txd */
+			0x178 (PIN_INPUT_SLEW | MUX_MODE8) /* vin2a_d4.uart10.ctsn */
+			0x17c (PIN_INPUT_SLEW | MUX_MODE8) /* vin2a_d5.uart10.rtsn */
+		>;
+	};
+
+	uart10_pins_sleep: uart10_pins_sleep {
+		pinctrl-single,pins = <
+			0x170 (PIN_INPUT | MUX_MODE15)
+			0x174 (PIN_INPUT | MUX_MODE15)
+			0x178 (PIN_INPUT | MUX_MODE15)
+			0x17c (PIN_INPUT | MUX_MODE15)
+		>;
+	};
+
 
 	mmc1_pins_default: mmc1_pins_default {
 		pinctrl-single,pins = <
@@ -262,22 +282,14 @@
 		>;
 	};
 
-	bt_pins_default: bt_pins_default {
+	bt_pin_default: bt_pin_default {
 		pinctrl-single,pins = <
-			0x170 (PIN_INPUT_SLEW | MUX_MODE8) /* vin2a_d2.uart10.rxd */
-			0x174 (PIN_INPUT_SLEW | MUX_MODE8) /* vin2a_d3.uart10.txd */
-			0x178 (PIN_INPUT_SLEW | MUX_MODE8) /* vin2a_d4.uart10.ctsn */
-			0x17c (PIN_INPUT_SLEW | MUX_MODE8) /* vin2a_d5.uart10.rtsn */
 			0x394 (PIN_OUTPUT_PULLDOWN | MUX_MODE14) /* mmc3_dat4.gpio1_22 */
 		>;
 	};
 
-	bt_pins_sleep: bt_pins_sleep {
+	bt_pin_sleep: bt_pin_sleep {
 		pinctrl-single,pins = <
-			0x170 (PIN_INPUT | MUX_MODE15)
-			0x174 (PIN_INPUT | MUX_MODE15)
-			0x178 (PIN_INPUT | MUX_MODE15)
-			0x17c (PIN_INPUT | MUX_MODE15)
 			0x394 (PIN_OUTPUT_PULLUP | MUX_MODE14)
 		>;
 	};
@@ -704,6 +716,13 @@
 
 	interrupts-extended = <&crossbar_mpu GIC_SPI 100 IRQ_TYPE_LEVEL_HIGH
 			       &dra7_pmx_core 0x1dc>;
+};
+
+&uart10 {
+        status = "disabled";
+        pinctrl-names = "default", "sleep";
+        pinctrl-0 = <&uart10_pins_default>;
+        pinctrl-1 = <&uart10_pins_sleep>;
 };
 
 &mac {
