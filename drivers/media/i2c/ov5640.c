@@ -95,6 +95,20 @@
 #define OV5640_REG_SDE_CTRL5		0x5585
 #define OV5640_REG_AVG_READOUT		0x56a1
 
+#define OV5640_LINK_FREQ_111	0
+#define OV5640_LINK_FREQ_166	1
+#define OV5640_LINK_FREQ_222	2
+#define OV5640_LINK_FREQ_333	3
+#define OV5640_LINK_FREQ_666	4
+
+static const s64 link_freq_menu_items[] = {
+	111066666,
+	166600000,
+	222133333,
+	332200000,
+	666400000,
+};
+
 enum ov5640_mode_id {
 	OV5640_MODE_QCIF_176_144 = 0,
 	OV5640_MODE_QVGA_320_240,
@@ -182,6 +196,7 @@ struct ov5640_mode_info {
 struct ov5640_ctrls {
 	struct v4l2_ctrl_handler handler;
 	struct {
+		struct v4l2_ctrl *link_freq;
 		struct v4l2_ctrl *pixel_rate;
 	};
 	struct {
@@ -233,6 +248,7 @@ struct ov5640_dev {
 	enum ov5640_frame_rate current_fr;
 	struct v4l2_fract frame_interval;
 	u64 pixel_rate;
+	u32 link_freq_idx;
 
 	struct ov5640_ctrls ctrls;
 
@@ -2199,9 +2215,19 @@ static int ov5640_set_fmt(struct v4l2_subdev *sd,
 	rate = sensor->current_mode->vtot * sensor->current_mode->htot;
 	rate *= ov5640_framerates[sensor->current_fr];
 	sensor->pixel_rate = rate;
-
 	__v4l2_ctrl_s_ctrl_int64(sensor->ctrls.pixel_rate,
 				 sensor->pixel_rate);
+
+	/*
+	 * We need to find a way to calculate the link_freq and map it
+	 * to one of the menu item. TBD
+	 *
+	 * Normally the link frequency could be derived the following way:
+	 * link_freq = rate * 16 / (2 * sensor->ep.bus.mipi_csi2.num_data_lanes)
+	 */
+	sensor->link_freq_idx = 0; /* Use dummy value for now */
+	__v4l2_ctrl_s_ctrl(sensor->ctrls.link_freq, sensor->link_freq_idx);
+
 out:
 	mutex_unlock(&sensor->lock);
 	return ret;
@@ -2580,6 +2606,13 @@ static int ov5640_init_controls(struct ov5640_dev *sensor)
 	hdl->lock = &sensor->lock;
 
 	/* Clock related controls */
+	ctrls->link_freq =
+		v4l2_ctrl_new_int_menu(hdl, ops,
+				       V4L2_CID_LINK_FREQ,
+				       ARRAY_SIZE(link_freq_menu_items) - 1,
+				       0, link_freq_menu_items);
+	ctrls->link_freq->flags |= V4L2_CTRL_FLAG_READ_ONLY;
+
 	ctrls->pixel_rate =
 		v4l2_ctrl_new_std(hdl, ops,
 				  V4L2_CID_PIXEL_RATE, 0, INT_MAX, 1,
@@ -2752,6 +2785,10 @@ static int ov5640_s_frame_interval(struct v4l2_subdev *sd,
 		sensor->pixel_rate = rate;
 		__v4l2_ctrl_s_ctrl_int64(sensor->ctrls.pixel_rate,
 					 sensor->pixel_rate);
+
+		/* see link_freq_idx comment in ov5640_set_fmt() */
+		sensor->link_freq_idx = 0; /* Use dummy value for now */
+		__v4l2_ctrl_s_ctrl(sensor->ctrls.link_freq, sensor->link_freq_idx);
 	}
 out:
 	mutex_unlock(&sensor->lock);
