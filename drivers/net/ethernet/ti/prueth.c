@@ -5088,7 +5088,9 @@ static int prueth_netdev_init(struct prueth *prueth,
 
 	ndev->netdev_ops = &emac_netdev_ops;
 	ndev->ethtool_ops = &emac_ethtool_ops;
+#ifdef CONFIG_HSR_PRP
 	ndev->lredev_ops = &emac_lredev_ops;
+#endif
 
 	return 0;
 
