@@ -27,11 +27,13 @@
 #include <linux/clk.h>
 #include <linux/of.h>
 #include <linux/of_platform.h>
+#include <linux/phy/phy.h>
 #include <linux/pm_runtime.h>
 
 struct dwc3_of_simple {
 	struct device		*dev;
 	struct clk		**clks;
+	struct phy		*serdes_phy;
 	int			num_clocks;
 };
 
@@ -101,6 +103,9 @@ static int dwc3_of_simple_probe(struct platform_device *pdev)
 						"clocks", "#clock-cells"));
 	if (ret)
 		return ret;
+
+	/* get SERDES phy to set SERDES lane mux */
+	simple->serdes_phy = devm_phy_optional_get(dev, "serdes-phy");
 
 	pm_runtime_enable(dev);
 	pm_runtime_get_sync(dev);
