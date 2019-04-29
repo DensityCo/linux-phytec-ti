@@ -352,6 +352,8 @@
 
 &dwc3_0 {
 	status = "okay";
+	phys = <&serdes0 PHY_TYPE_USB2 1>;
+	phy-names = "serdes-phy";
 };
 
 &usb0 {
