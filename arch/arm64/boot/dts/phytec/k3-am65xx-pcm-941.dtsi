@@ -339,7 +339,7 @@
 };
 
 &pcie1_rc {
-	status = "okay";
+	status = "disabled";
 	pinctrl-names = "default";
 	pinctrl-0 = <&pcie1_reset_pin>;
 	phys = <&serdes1 PHY_TYPE_PCIE 0>;
@@ -348,7 +348,7 @@
 };
 
 &serdes1 {
-	status = "okay";
+	status = "disabled";
 };
 
 &main_spi1 {
