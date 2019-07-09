@@ -361,6 +361,9 @@
 	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&mcu_uart0_pins_default>;
+
+	/delete-property/ dmas;
+	/delete-property/ dma-names;
 };
 
 &main_uart1 {
@@ -373,6 +376,9 @@
 	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&main_uart2_pins_default>;
+
+	/delete-property/ dmas;
+	/delete-property/ dma-names;
 };
 
 &dwc3_0 {
