@@ -355,14 +355,6 @@
 	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&main_spi1_pins_default>;
-
-	/* main_spi1 enumerates as spi3 */
-	spidev3_0: spidev3@0 {
-		compatible = "rohm,dh2228fv";	/* dummy compat string for spidev */
-
-		reg = <0>;
-		spi-max-frequency = <48000000>;
-	};
 };
 
 &mcu_uart0 {
