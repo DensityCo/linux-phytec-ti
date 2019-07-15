@@ -47,7 +47,7 @@
 	status = "okay";
 };
 
-&main_i2c1 {
+&main_i2c0 {
 	#address-cells = <1>;
 	#size-cells = <0>;
 
