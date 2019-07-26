@@ -1,0 +1,64 @@
+/*
+ * Copyright (C) 2015 Russell Robinson <rrobinson@phytec.com>
+ * Copyright (C) PHYTEC America, LLC.
+ *
+ * Based on arch/arm/boot/dts/am335x-phytec-lcd018.dtsi
+ * Copyright (C) 2014 Wadim Egorov <w.egorov@phytec.de> PHYTEC Messtechnik GmbH
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+/*
+ * The board specific DTS file have to:
+ *  - Specify pwms and enable gpios for backlight
+ *  - Mux the display enable pins if available
+ *  - Create the i2c_ts node on the specific i2c bus
+*/
+
+&lcd2 {
+	compatible = "PM070WL4", "panel-dpi";
+	status = "okay";
+
+	panel-timing {
+		clock-frequency = <32000000>;
+		hactive = <800>;
+		vactive = <480>;
+		hfront-porch = <42>;
+		hback-porch = <86>;
+		hsync-len = <128>;
+		vfront-porch = <10>;
+		vback-porch = <33>;
+		vsync-len = <2>;
+		hsync-active = <0>;
+		vsync-active = <0>;
+		de-active = <1>;
+		pixelclk-active = <1>;
+	};
+	port {
+		lcd_in: endpoint {
+			remote-endpoint = <&dpi_out>;
+		};
+	};
+};
+
+&lcd_port {
+	status = "okay";
+
+	dpi_out: endpoint {
+		remote-endpoint = <&lcd_in>;
+		data-lines = <24>;
+	};
+};
+
+&backlight {
+	status = "okay";
+
+	brightness-levels = <0 4 8 16 32 64 128 255>;
+	default-brightness-level = <6>;
+};
+
+&stmpe811 {
+	status = "okay";
+};

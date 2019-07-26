@@ -416,6 +416,12 @@
 		>;
 	};
 
+	stmpe_ts_irq_pin: stmpe_ts_irq_pin {
+		pinctrl-single,pins = <
+			0x2e8 (PIN_INPUT | MUX_MODE14) /* mcasp1_axr13.gpio6_4 */
+		>;
+	};
+
         lcd_pins: pinmux_lcd {
                 pinctrl-single,pins = <
 			0x158 (PIN_OUTPUT | MUX_MODE4 | SLEWCONTROL | MODE_SELECT)   /* vin2a_de0.vout2_de */
@@ -674,15 +680,16 @@
 	};
 
 	stmpe811: stmpe811@41 {
-		compatible = "st,stmpe811";
 		status = "disabled";
-		reg = <0x41>;
-		interrupt-parent = <&gpio6>;
-		interrupts = <4 IRQ_TYPE_LEVEL_LOW>;
-		interrupt-controller;
+		compatible = "st,stmpe811";
+		pinctrl-names = "default";
+		pinctrl-0 = <&stmpe_ts_irq_pin>;
 
+		reg = <0x41>;
+		id = <0>;
+		blocks = <0x5>;
+		irq-gpio = <&gpio6 4 IRQ_TYPE_LEVEL_LOW>;
 		wakeup-source;
-		st,autosleep-timeout = <1024>;
 
 		stmpe_touchscreen {
 			compatible = "st,stmpe-ts";
