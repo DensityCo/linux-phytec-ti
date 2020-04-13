@@ -231,6 +231,11 @@
 	pinctrl-1 = <&i2c3_pins_sleep>;
 	clock-frequency = <400000>;
 
+    mma8452@1c {
+        compatible = "fsl,mma8452";
+        reg = <0x1c>;
+    };
+
     pca9633@60 {
         compatible = "nxp,pca9633";
         #address-cells = <1>;
@@ -258,6 +263,7 @@
             linux,default-trigger = "none";
         };
     };
+
 };
 
 &i2c4 {
