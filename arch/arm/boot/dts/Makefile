@@ -607,6 +607,9 @@ dtb-$(CONFIG_SOC_DRA7XX) += \
 	am57xx-evm-reva3.dtb \
 	am57xx-evm-reva3-cam-mt9t111.dtb \
 	am57xx-evm-reva3-cam-ov10635.dtb \
+	am571x-density-luna-s5b-512mb.dtb \
+	am572x-density-luna-s5b-1gb.dtb \
+	am572x-ksp-5015.dtb \
 	am572x-phycore-rdk.dtb \
 	am572x-phycore-rdk-40201111i.dtb \
 	am572x-phycore-rdk-41201111i.dtb \

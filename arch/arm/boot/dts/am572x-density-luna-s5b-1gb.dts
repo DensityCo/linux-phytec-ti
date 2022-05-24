@@ -1,0 +1,45 @@
+/*
+ * Copyright (C) 2022 Density, Inc
+ *
+ */
+/dts-v1/;
+
+#include "dra74x.dtsi"
+
+#include "am57xx-density-luna-io.dtsi"      /* Luna I/O */
+#include "am57xx-density-luna.dtsi"			/* Luna Base */
+#include "cmem-dra72x.dtsi"                 /* cmem for dsp/eve */
+
+/ {
+	model = "Density Luna with 1GiB DDR3, Industrial Temp";
+	compatible = "density,am571x-density-luna", "ti,dra742", "ti,dra74", "ti,dra7";
+
+	memory {
+		device_type = "memory";
+		reg = <0x0 0x80000000 0x0 0x40000000>; /* 1GiB */
+	};
+};
+
+&spidev1_0 {
+	status = "disabled";
+};
+
+&qspi {
+	status = "disabled";
+};
+
+&qspi_nor {
+	status = "disabled";
+};
+
+&qspi_nor_cs0 {
+	status = "disabled";
+};
+
+&dss {
+	status = "disabled";
+};
+
+&gpu {
+	status = "disabled";
+};
