@@ -5,7 +5,7 @@
                 ranges;
 
                 cmem_block_mem_0: cmem_block_mem@a0000000 {
-                        reg = <0x0 0xa0000000 0x0 0x0c000000>;
+                        reg = <0x0 0x90000000 0x0 0x0c000000>;
                         no-map;
                         status = "okay";
                 };
