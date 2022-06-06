@@ -9,8 +9,8 @@
 #include <dt-bindings/interrupt-controller/irq.h>
 
 / {
-	model = "PHYTEC phyCORE-AM572x";
-	compatible = "phytec,am572x-phycore-som", "ti,dra72", "ti,dra74", "ti,dra7";
+	model = "Density AM57xx Luna";
+	compatible = "density,am57xx-luna", "ti,dra72", "ti,dra74", "ti,dra7";
 
 	aliases {
 		rtc2 = &i2c_rtc;
