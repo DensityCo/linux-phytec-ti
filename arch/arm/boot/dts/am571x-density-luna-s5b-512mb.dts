@@ -20,6 +20,22 @@
 	};
 };
 
+&mmc1 {
+	status = "disabled";
+};
+
+&ipu1 {
+	status = "disabled";
+};
+
+&ipu2 {
+	status = "disabled";
+};
+
+&dsp1 {
+	status = "disabled";
+};
+
 &ipu2_cma_pool {
 	status = "disabled";
 };

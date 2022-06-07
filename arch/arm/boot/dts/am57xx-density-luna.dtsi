@@ -189,6 +189,41 @@
 			0x174 (PIN_OUTPUT | MUX_MODE14)	/* vin2a_d3.gpio4_4 */
 		>;
 	};
+
+	mmc1_pins_default: mmc1_pins_default {
+		pinctrl-single,pins = <
+			0x36c (PIN_INPUT | MUX_MODE14)	/* mmc1sdcd.gpio6_27 */
+			0x354 (PIN_INPUT_PULLUP | MUX_MODE0) /* mmc1_clk.clk */
+			0x358 (PIN_INPUT_PULLUP | MUX_MODE0) /* mmc1_cmd.cmd */
+			0x35c (PIN_INPUT_PULLUP | MUX_MODE0) /* mmc1_dat0.dat0 */
+			0x360 (PIN_INPUT_PULLUP | MUX_MODE0) /* mmc1_dat1.dat1 */
+			0x364 (PIN_INPUT_PULLUP | MUX_MODE0) /* mmc1_dat2.dat2 */
+			0x368 (PIN_INPUT_PULLUP | MUX_MODE0) /* mmc1_dat3.dat3 */
+		>;
+	};
+
+	mmc1_pins_sleep: mmc1_pins_sleep {
+		pinctrl-single,pins = <
+			0x354 (PIN_INPUT | MUX_MODE15)
+			0x358 (PIN_INPUT | MUX_MODE15)
+			0x35c (PIN_INPUT | MUX_MODE15)
+			0x360 (PIN_INPUT | MUX_MODE15)
+			0x364 (PIN_INPUT | MUX_MODE15)
+			0x368 (PIN_INPUT | MUX_MODE15)
+			0x36c (PIN_INPUT | MUX_MODE15)
+		>;
+	};
+
+	mmc1_pins_hs: mmc1_pins_hs {
+		pinctrl-single,pins = <
+			0x354 (PIN_INPUT_PULLUP | MUX_VIRTUAL_MODE11 | MUX_MODE0)       /* mmc1_clk.clk */
+			0x358 (PIN_INPUT_PULLUP | MUX_VIRTUAL_MODE11 | MUX_MODE0)       /* mmc1_cmd.cmd */
+			0x35c (PIN_INPUT_PULLUP | MUX_VIRTUAL_MODE11 | MUX_MODE0)       /* mmc1_dat0.dat0 */
+			0x360 (PIN_INPUT_PULLUP | MUX_VIRTUAL_MODE11 | MUX_MODE0)       /* mmc1_dat1.dat1 */
+			0x364 (PIN_INPUT_PULLUP | MUX_VIRTUAL_MODE11 | MUX_MODE0)       /* mmc1_dat2.dat2 */
+			0x368 (PIN_INPUT_PULLUP | MUX_VIRTUAL_MODE11 | MUX_MODE0)       /* mmc1_dat3.dat3 */
+		>;
+	};
 };
 
 &i2c1 {
@@ -376,4 +411,16 @@
     status = "ok";
 
     vdda_video-supply = <&ldoln_reg>;
+};
+
+&mmc1 {
+	status = "okay";
+	pinctrl-names = "default", "sleep", "hs";
+	pinctrl-0 = <&mmc1_pins_default>;
+	pinctrl-1 = <&mmc1_pins_sleep>;
+	pinctrl-2 = <&mmc1_pins_hs>;
+	vmmc-supply = <&ldo1_reg>;
+	bus-width = <4>;
+	cd-gpios = <&gpio6 27 0>; /* gpio 219 */
+	max-frequency = <96000000>;
 };

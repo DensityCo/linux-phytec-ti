@@ -12,7 +12,7 @@
 
 / {
 	model = "Density Luna with 1GiB DDR3, Industrial Temp";
-	compatible = "density,am571x-density-luna", "ti,dra742", "ti,dra74", "ti,dra7";
+	compatible = "density,am572x-density-luna", "ti,dra742", "ti,dra74", "ti,dra7";
 
 	memory {
 		device_type = "memory";
@@ -20,16 +20,32 @@
 	};
 };
 
-&mmu0_dsp2 {
-	status = "okay";
+&mmc1 {
+	status = "disabled";
 };
 
-&mmu1_dsp2 {
-	status = "okay";
+&ipu1 {
+	status = "disabled";
+};
+
+&ipu2 {
+	status = "disabled";
+};
+
+&dsp1 {
+	status = "disabled";
 };
 
 &dsp2 {
-	status = "okay";
+	status = "disabled";
+};
+
+&mmu0_dsp2 {
+	status = "disabled";
+};
+
+&mmu1_dsp2 {
+	status = "disabled";
 };
 
 &ipu2_cma_pool {
