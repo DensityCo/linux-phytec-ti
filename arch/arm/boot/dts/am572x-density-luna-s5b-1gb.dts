@@ -22,12 +22,12 @@
 
 /* EMMC */
 &mmc2 {
-	status = "disabled";
+	status = "okay";
 };
 
 /* SD Card */
 &mmc1 {
-	status = "okay";
+	status = "disabled";
 };
 
 /* DSP 1 */
