@@ -70,28 +70,28 @@
 
 /* IPU 1 */
 &ipu1 {
-	status = "disabled";
+	status = "okay";
 };
 
 &ipu1_cma_pool {
-	status = "disabled";
+	status = "okay";
 };
 
 &mmu_ipu1 {
-	status = "disabled";
+	status = "okay";
 };
 
 /* IPU 2 */
 &ipu2 {
-	status = "disabled";
+	status = "okay";
 };
 
 &ipu2_cma_pool {
-	status = "disabled";
+	status = "okay";
 };
 
 &mmu_ipu2 {
-	status = "disabled";
+	status = "okay";
 };
 
 /* SPI */
