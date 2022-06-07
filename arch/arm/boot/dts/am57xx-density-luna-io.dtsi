@@ -23,16 +23,16 @@
 		#size-cells = <2>;
 		ranges;
 
-		ipu2_cma_pool: ipu2_cma@95800000 {
+		dsp1_cma_pool: dsp1_cma@99000000 {
 			compatible = "shared-dma-pool";
-			reg = <0x0 0x95800000 0x0 0x3800000>; /* 56 MB */
+			reg = <0x0 0x99000000 0x0 0x4000000>; /* 64 MB */
 			reusable;
 			status = "okay";
 		};
 
-		dsp1_cma_pool: dsp1_cma@99000000 {
+		dsp2_cma_pool: dsp2_cma@9f000000 {
 			compatible = "shared-dma-pool";
-			reg = <0x0 0x99000000 0x0 0x4000000>; /* 64 MB */
+			reg = <0x0 0x9f000000 0x0 0x1000000>; /* 16 MB */
 			reusable;
 			status = "okay";
 		};
@@ -44,9 +44,9 @@
 			status = "okay";
 		};
 
-		dsp2_cma_pool: dsp2_cma@9f000000 {
+		ipu2_cma_pool: ipu2_cma@95800000 {
 			compatible = "shared-dma-pool";
-			reg = <0x0 0x9f000000 0x0 0x1000000>; /* 16 MB */
+			reg = <0x0 0x95800000 0x0 0x3800000>; /* 56 MB */
 			reusable;
 			status = "okay";
 		};

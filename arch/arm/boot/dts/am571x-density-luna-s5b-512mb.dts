@@ -8,7 +8,7 @@
 
 #include "am57xx-density-luna-io.dtsi"      /* Luna I/O - based on am572x-phycore-som.dtsi */
 #include "am57xx-density-luna.dtsi"         /* Luna Base - based on am572x-ksp-5015.dtsi */
-#include "cmem-dra72x.dtsi"                 /* cmem for dsp/eve */
+// #include "cmem-dra72x.dtsi"                 /* cmem for dsp/eve */
 
 / {
 	model = "Density Luna with 512MiB DDR3, Industrial Temp";
@@ -20,23 +20,18 @@
 	};
 };
 
+/* EMMC */
+&mmc2 {
+	status = "okay";
+};
+
+/* SD Card */
 &mmc1 {
 	status = "disabled";
 };
 
-&ipu1 {
-	status = "disabled";
-};
-
-&ipu2 {
-	status = "disabled";
-};
-
+/* DSP 1 */
 &dsp1 {
-	status = "disabled";
-};
-
-&ipu2_cma_pool {
 	status = "disabled";
 };
 
@@ -44,14 +39,46 @@
 	status = "disabled";
 };
 
-&ipu1_cma_pool {
+&mmu0_dsp1 {
 	status = "disabled";
 };
 
+&mmu1_dsp1 {
+	status = "disabled";
+};
+
+/* DSP 2 */
 &dsp2_cma_pool {
 	status = "disabled";
 };
 
+/* IPU 1 */
+&ipu1 {
+	status = "disabled";
+};
+
+&ipu1_cma_pool {
+	status = "disabled";
+};
+
+&mmu_ipu1 {
+	status = "disabled";
+};
+
+/* IPU 2 */
+&ipu2 {
+	status = "disabled";
+};
+
+&ipu2_cma_pool {
+	status = "disabled";
+};
+
+&mmu_ipu2 {
+	status = "disabled";
+};
+
+/* SPI */
 &qspi {
 	status = "disabled";
 };

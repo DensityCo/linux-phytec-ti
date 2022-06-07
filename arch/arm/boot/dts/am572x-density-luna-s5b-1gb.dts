@@ -20,39 +20,52 @@
 	};
 };
 
+/* EMMC */
+&mmc2 {
+	status = "okay";
+};
+
+/* SD Card */
 &mmc1 {
 	status = "disabled";
 };
 
-&ipu1 {
-	status = "disabled";
-};
-
-&ipu2 {
-	status = "disabled";
-};
-
+/* DSP 1 */
 &dsp1 {
-	status = "disabled";
-};
-
-&dsp2 {
-	status = "disabled";
-};
-
-&mmu0_dsp2 {
-	status = "disabled";
-};
-
-&mmu1_dsp2 {
-	status = "disabled";
-};
-
-&ipu2_cma_pool {
-	status = "disabled";
+	status = "okay";
 };
 
 &dsp1_cma_pool {
+	status = "okay";
+};
+
+&mmu0_dsp1 {
+	status = "okay";
+};
+
+&mmu1_dsp1 {
+	status = "okay";
+};
+
+/* DSP 2 */
+&dsp2 {
+	status = "okay";
+};
+
+&dsp2_cma_pool {
+	status = "okay";
+};
+
+&mmu0_dsp2 {
+	status = "okay";
+};
+
+&mmu1_dsp2 {
+	status = "okay";
+};
+
+/* IPU 1 */
+&ipu1 {
 	status = "disabled";
 };
 
@@ -60,10 +73,24 @@
 	status = "disabled";
 };
 
-&dsp2_cma_pool {
+&mmu_ipu1 {
 	status = "disabled";
 };
 
+/* IPU 2 */
+&ipu2 {
+	status = "disabled";
+};
+
+&ipu2_cma_pool {
+	status = "disabled";
+};
+
+&mmu_ipu2 {
+	status = "disabled";
+};
+
+/* SPI */
 &qspi {
 	status = "disabled";
 };
