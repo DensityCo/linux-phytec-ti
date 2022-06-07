@@ -22,12 +22,12 @@
 
 /* EMMC */
 &mmc2 {
-	status = "okay";
+	status = "disabled";
 };
 
 /* SD Card */
 &mmc1 {
-	status = "disabled";
+	status = "okay";
 };
 
 /* DSP 1 */
@@ -50,6 +50,10 @@
 /* DSP 2 */
 &dsp2 {
 	status = "okay";
+	memory-region = <&dsp2_cma_pool>;
+	mboxes = <&mailbox6 &mbox_dsp2_ipc3x>;
+	timers = <&timer6>;
+	watchdog-timers = <&timer13>;
 };
 
 &dsp2_cma_pool {
